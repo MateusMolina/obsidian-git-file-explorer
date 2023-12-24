@@ -3,17 +3,24 @@
     right: 0;
     top: 0;
     padding: 0.5em;
-    background-color: #ff4d4d;
     border-radius: 25%;
     font-size: 0.8em;
     font-weight: bold;
+    transition: background-color 1s ease;
     color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 1.5em;
+    width: 2em;
     height: 1.5em;
 }
-.git-fe-component:hover {
+.git-fe-component-changes {
+    background-color: #ff4d4d;
+}
+
+.git-fe-component-changes:hover {
     background-color: #ff7f50;
+}
+.git-fe-component-committed {
+    background-color: #129060 !important;
 }
