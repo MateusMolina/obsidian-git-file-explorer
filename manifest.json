@@ -3,7 +3,7 @@
 	"name": "Git File Explorer",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Adds relevant git information to detected git repostitories in the file explorer.",
+	"description": "Add relevant git information to detected git repostitories in the file explorer.",
 	"author": "Mateus Molina",
 	"authorUrl": "https://mateusmolina.github.io",
 	"isDesktopOnly": true

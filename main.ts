@@ -1,6 +1,6 @@
 import { Plugin, FileExplorer, FileSystemAdapter } from "obsidian";
-import { GitHandler } from "./gitHandler";
-import { FileExplorerUpdater } from "./fileExplorerUpdater";
+import { GitHandler } from "./src/gitHandler";
+import { FileExplorerUpdater } from "./src/fileExplorerUpdater";
 
 interface GitFileExplorerPluginSettings {
 	mySetting: string;
