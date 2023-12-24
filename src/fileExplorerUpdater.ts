@@ -26,15 +26,17 @@ export class FileExplorerUpdater {
 	}
 
 	private appendTextToFolderItem(folder: FolderItem, text: string | number) {
-		const updatedText = `  (${text})`;
+		const updatedText = `${text}`;
 
-		let countEl = folder.selfEl.querySelector("#counter");
+		let countEl = folder.selfEl.querySelector("#counter") as HTMLElement;
 		if (!countEl) {
 			countEl = document.createElement("span");
+			countEl.classList.add("git-status-counter");
 			countEl.id = "counter";
 			folder.selfEl.appendChild(countEl);
 		}
 
+		countEl.style.display = text === 0 || text === "" ? "none" : "";
 		countEl.textContent = updatedText;
 	}
 

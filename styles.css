@@ -1,8 +1,16 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.git-status-counter {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0.5em;
+    background-color: #ff4d4d;
+    border-radius: 25%;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5em;
+    height: 1.5em;
+}
