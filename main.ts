@@ -32,6 +32,11 @@ export default class GitFileExplorerPlugin extends Plugin {
 		);
 
 		this.fileExplorerUpdater.updateFileExplorer();
+		this.registerEventListeners(
+			this.fileExplorerUpdater.updateFileExplorer.bind(
+				this.fileExplorerUpdater
+			)
+		);
 	};
 
 	onunload() {
@@ -67,5 +72,12 @@ export default class GitFileExplorerPlugin extends Plugin {
 			return adapter.getBasePath();
 		}
 		return "";
+	}
+
+	private registerEventListeners(callback: () => void) {
+		this.registerEvent(this.app.vault.on("create", callback));
+		this.registerEvent(this.app.vault.on("delete", callback));
+		this.registerEvent(this.app.vault.on("rename", callback));
+		this.registerEvent(this.app.vault.on("modify", callback));
 	}
 }

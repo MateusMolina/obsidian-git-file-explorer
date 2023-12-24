@@ -26,9 +26,16 @@ export class FileExplorerUpdater {
 	}
 
 	private appendTextToFolderItem(folder: FolderItem, text: string | number) {
-		const countEl = document.createElement("span");
-		countEl.textContent = `  (${text})`;
-		folder.selfEl.appendChild(countEl);
+		const updatedText = `  (${text})`;
+
+		let countEl = folder.selfEl.querySelector("#counter");
+		if (!countEl) {
+			countEl = document.createElement("span");
+			countEl.id = "counter";
+			folder.selfEl.appendChild(countEl);
+		}
+
+		countEl.textContent = updatedText;
 	}
 
 	private isFolder = (item: AFItem): item is FolderItem =>
