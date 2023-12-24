@@ -29,5 +29,31 @@ export class GitHandler {
 		});
 	}
 
+	async stageAll(path: string): Promise<void> {
+		const cmd = `git -C ${this.getFullPath(path)} add .`;
+		return new Promise((resolve, reject) => {
+			exec(cmd, (error, stdout, stderr) => {
+				if (error) {
+					console.error(`exec error: ${error}`);
+					return reject(error);
+				}
+				resolve();
+			});
+		});
+	}
+
+	async commit(path: string, message: string): Promise<void> {
+		const cmd = `git -C ${this.getFullPath(path)} commit -m "${message}"`;
+		return new Promise((resolve, reject) => {
+			exec(cmd, (error, stdout, stderr) => {
+				if (error) {
+					console.error(`exec error: ${error}`);
+					return reject(error);
+				}
+				resolve();
+			});
+		});
+	}
+
 	private getFullPath = (path: string) => join(this.pathPrefix, path);
 }

@@ -1,4 +1,4 @@
-.git-status-counter {
+.git-fe-component {
     position: absolute;
     right: 0;
     top: 0;
@@ -13,4 +13,7 @@
     align-items: center;
     width: 1.5em;
     height: 1.5em;
+}
+.git-fe-component:hover {
+    background-color: #ff7f50;
 }
