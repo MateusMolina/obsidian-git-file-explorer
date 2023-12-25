@@ -38,7 +38,7 @@ export class GitFEComponent {
 		if (this.eventsDisabled) return;
 		this.eventsDisabled = true;
 		this.gitRepository.stageAll();
-		this.gitRepository.commit("Sync " + new Date().toLocaleString());
+		this.gitRepository.commit("Sync " + new Date().toISOString());
 		this.gitFEElement.className =
 			"git-fe-component git-fe-component-committed";
 		setTimeout(() => {
