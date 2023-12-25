@@ -4,11 +4,9 @@ export class GitFEComponent {
 	private gitRepository: GitRepository;
 	private gitFEElement: HTMLElement;
 	private eventsDisabled = false;
+	private changesBuffer = 0;
 
-	constructor(
-		parent: HTMLElement,
-		gitRepository: GitRepository
-	) {
+	constructor(parent: HTMLElement, gitRepository: GitRepository) {
 		this.parent = parent;
 		this.gitRepository = gitRepository;
 		this.gitFEElement = this.createOrUpdateElement();
@@ -16,36 +14,39 @@ export class GitFEComponent {
 	}
 
 	async update() {
-		const changedFilesCount =
-			await this.gitRepository.getChangedFilesCount();
-		this.updateText(changedFilesCount);
+		await this.updateChanges();
 	}
 
-	public updateText(text: string | number): void {
-		if (text == 0) {
-			this.gitFEElement.textContent = "git";
+	async updateChanges() {
+		this.changesBuffer = await this.gitRepository.getChangedFilesCount();
+
+		if (this.changesBuffer == 0) {
+			this.updateText("git");
 			this.gitFEElement.classList.remove("git-fe-component-changes");
 			this.eventsDisabled = true;
 			return;
 		}
 
 		this.gitFEElement.classList.add("git-fe-component-changes");
-		this.gitFEElement.textContent = text.toString();
+		this.updateText(this.changesBuffer.toString());
 		this.eventsDisabled = false;
 	}
+
+	public updateText = (text: string) =>
+		(this.gitFEElement.textContent = text);
 
 	async onClick() {
 		if (this.eventsDisabled) return;
 		this.eventsDisabled = true;
-		this.gitRepository.stageAll();
-		this.gitRepository.commit("Sync " + new Date().toISOString());
+		await this.gitRepository.stageAll();
+		await this.gitRepository.commit("Sync " + new Date().toISOString());
 		this.gitFEElement.className =
 			"git-fe-component git-fe-component-committed";
 		setTimeout(() => {
 			this.gitFEElement.classList.remove("git-fe-component-committed");
 		}, 3000);
 
-		this.update();
+		await this.update();
 	}
 
 	public onMouseOver() {
@@ -55,7 +56,7 @@ export class GitFEComponent {
 
 	public onMouseOut() {
 		if (this.eventsDisabled) return;
-		this.update();
+		this.updateText(this.changesBuffer.toString());
 	}
 
 	private createOrUpdateElement(): HTMLElement {
