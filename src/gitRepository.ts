@@ -2,22 +2,27 @@ import { exec } from "child_process";
 import { existsSync } from "fs";
 import { join } from "path";
 
-export class GitHandler {
-	pathPrefix: string;
+export class GitRepository {
+	private repoAbsPath: string;
 
-	constructor(pathPrefix: string) {
-		this.pathPrefix = pathPrefix;
+	private constructor(repoAbsPath: string) {
+		this.repoAbsPath = repoAbsPath;
 	}
 
-	async isGitRepo(path: string): Promise<boolean> {
-		const gitDir = join(this.getFullPath(path), ".git");
+	static async getInstance(repoAbsPath: string): Promise<GitRepository> {
+		if (!(await GitRepository.isGitRepo(repoAbsPath)))
+			return Promise.reject("Not a git repository");
+
+		return new GitRepository(repoAbsPath);
+	}
+
+	static async isGitRepo(fullPath: string): Promise<boolean> {
+		const gitDir = join(fullPath, ".git");
 		return existsSync(gitDir);
 	}
 
-	async getChangedFilesCount(path: string): Promise<number> {
-		const cmd = `git -C ${this.getFullPath(
-			path
-		)} status --porcelain | wc -l`;
+	async getChangedFilesCount(): Promise<number> {
+		const cmd = `git -C ${this.repoAbsPath} status --porcelain | wc -l`;
 		return new Promise((resolve, reject) => {
 			exec(cmd, (error, stdout, stderr) => {
 				if (error) {
@@ -29,8 +34,8 @@ export class GitHandler {
 		});
 	}
 
-	async stageAll(path: string): Promise<void> {
-		const cmd = `git -C ${this.getFullPath(path)} add .`;
+	async stageAll(): Promise<void> {
+		const cmd = `git -C ${this.repoAbsPath} add .`;
 		return new Promise((resolve, reject) => {
 			exec(cmd, (error, stdout, stderr) => {
 				if (error) {
@@ -42,8 +47,8 @@ export class GitHandler {
 		});
 	}
 
-	async commit(path: string, message: string): Promise<void> {
-		const cmd = `git -C ${this.getFullPath(path)} commit -m "${message}"`;
+	async commit(message: string): Promise<void> {
+		const cmd = `git -C ${this.repoAbsPath} commit -m "${message}"`;
 		return new Promise((resolve, reject) => {
 			exec(cmd, (error, stdout, stderr) => {
 				if (error) {
@@ -54,6 +59,4 @@ export class GitHandler {
 			});
 		});
 	}
-
-	private getFullPath = (path: string) => join(this.pathPrefix, path);
 }

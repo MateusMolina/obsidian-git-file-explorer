@@ -1,13 +1,13 @@
 import { FileExplorer, AFItem, TFolder, FolderItem } from "obsidian";
-import { GitHandler } from "./gitHandler";
+import { GitRepository } from "./gitRepository";
 import { GitFEComponent } from "./gitFEComponent";
-
+import { join } from "path";
 export class FileExplorerUpdater {
-	private gitHandler: GitHandler;
+	private vaultBasePath: string;
 	private fileExplorer: FileExplorer;
 
-	constructor(gitHandler: GitHandler, fileExplorer: FileExplorer) {
-		this.gitHandler = gitHandler;
+	constructor(vaultBasePath: string, fileExplorer: FileExplorer) {
+		this.vaultBasePath = vaultBasePath;
 		this.fileExplorer = fileExplorer;
 	}
 
@@ -17,17 +17,22 @@ export class FileExplorerUpdater {
 		) as FolderItem[];
 
 		for (const folderItem of folderItems) {
-			const folder = folderItem.file as TFolder;
-			if (await this.gitHandler.isGitRepo(folder.path)) {
-				new GitFEComponent(
-					folderItem.selfEl,
-					folder.path,
-					this.gitHandler
-				).update();
-			}
+			const repo = await GitRepository.getInstance(
+				this.getFullPathFromFolderItem(folderItem)
+			).catch((error) => {
+				return;
+			});
+
+			if (repo) new GitFEComponent(folderItem.selfEl, repo).update();
 		}
 	}
 
 	private isFolder = (item: AFItem): item is FolderItem =>
 		(item as FolderItem).file instanceof TFolder;
+
+	private getFullPathFromFolderItem(folderItem: FolderItem): string {
+		const folder = folderItem.file as TFolder;
+		return join(this.vaultBasePath, folder.path);
+	}
 }
+

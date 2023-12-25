@@ -1,33 +1,24 @@
-import { GitHandler } from "./gitHandler";
+import { GitRepository } from "./gitRepository";
 export class GitFEComponent {
+	private parent: HTMLElement;
+	private gitRepository: GitRepository;
 	private gitFEElement: HTMLElement;
 	private eventsDisabled = false;
 
 	constructor(
-		private parent: HTMLElement,
-		private repoPath: string,
-		private gitHandler: GitHandler
+		parent: HTMLElement,
+		gitRepository: GitRepository
 	) {
+		this.parent = parent;
+		this.gitRepository = gitRepository;
 		this.gitFEElement = this.createOrUpdateElement();
 		this.addEventListeners();
 	}
 
 	async update() {
-		const changedFilesCount = await this.gitHandler.getChangedFilesCount(
-			this.repoPath
-		);
+		const changedFilesCount =
+			await this.gitRepository.getChangedFilesCount();
 		this.updateText(changedFilesCount);
-	}
-
-	private createOrUpdateElement(): HTMLElement {
-		let element = this.parent.querySelector("#counter") as HTMLElement;
-		if (!element) {
-			element = document.createElement("span");
-			element.classList.add("git-fe-component");
-			element.id = "counter";
-			this.parent.appendChild(element);
-		}
-		return element;
 	}
 
 	public updateText(text: string | number): void {
@@ -46,11 +37,8 @@ export class GitFEComponent {
 	async onClick() {
 		if (this.eventsDisabled) return;
 		this.eventsDisabled = true;
-		this.gitHandler.stageAll(this.repoPath);
-		this.gitHandler.commit(
-			this.repoPath,
-			"Sync " + new Date().toLocaleString()
-		);
+		this.gitRepository.stageAll();
+		this.gitRepository.commit("Sync " + new Date().toLocaleString());
 		this.gitFEElement.className =
 			"git-fe-component git-fe-component-committed";
 		setTimeout(() => {
@@ -68,6 +56,17 @@ export class GitFEComponent {
 	public onMouseOut() {
 		if (this.eventsDisabled) return;
 		this.update();
+	}
+
+	private createOrUpdateElement(): HTMLElement {
+		let element = this.parent.querySelector("#counter") as HTMLElement;
+		if (!element) {
+			element = document.createElement("span");
+			element.classList.add("git-fe-component");
+			element.id = "counter";
+			this.parent.appendChild(element);
+		}
+		return element;
 	}
 
 	private addEventListeners() {
