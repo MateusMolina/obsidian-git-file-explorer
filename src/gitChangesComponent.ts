@@ -1,16 +1,10 @@
 import { GitRepository } from "./gitRepository";
-export class GitChangesComponent {
-	private parent: HTMLElement;
-	private gitRepository: GitRepository;
-	private gitFEElement: HTMLElement;
-	private eventsDisabled = false;
+import { GitWidget } from "./gitWidget";
+export class GitChangesComponent extends GitWidget {
 	private changesBuffer = 0;
 
 	constructor(parent: HTMLElement, gitRepository: GitRepository) {
-		this.parent = parent;
-		this.gitRepository = gitRepository;
-		this.gitFEElement = this.createOrUpdateElement();
-		this.addEventListeners();
+		super(parent, gitRepository, "git-changes-component");
 	}
 
 	async update() {
@@ -20,67 +14,30 @@ export class GitChangesComponent {
 	async updateChanges() {
 		this.changesBuffer = await this.gitRepository.getChangedFilesCount();
 
-		if (this.changesBuffer == 0) {
-			this.updateText("git");
+		if (this.changesBuffer) {
+			this.gitFEElement.classList.add("git-fe-component-changes");
+			this.updateText(this.changesBuffer.toString());
+			this.enableEvents();
+		} else {
 			this.gitFEElement.classList.remove("git-fe-component-changes");
-			this.eventsDisabled = true;
-			return;
+			this.updateText("git");
+			this.disableEvents();
 		}
-
-		this.gitFEElement.classList.add("git-fe-component-changes");
-		this.updateText(this.changesBuffer.toString());
-		this.eventsDisabled = false;
 	}
-
-	public updateText = (text: string) =>
-		(this.gitFEElement.textContent = text);
 
 	async onClick() {
-		if (this.eventsDisabled) return;
-		this.eventsDisabled = true;
-		await this.gitRepository.stageAll();
-		await this.gitRepository.commit("Sync " + new Date().toISOString());
-		this.gitFEElement.className =
-			"git-fe-component git-fe-component-success";
-		setTimeout(() => {
-			this.gitFEElement.classList.remove("git-fe-component-success");
-		}, 3000);
-
-		await this.update();
+		this.executeWithSuccessAnimation(async () => {
+			this.gitFEElement.removeClass("git-fe-component-changes");
+			await this.gitRepository.stageAll();
+			await this.gitRepository.commit("Sync " + new Date().toISOString());
+		}).finally(this.update.bind(this));
 	}
 
-	public onMouseOver() {
-		if (this.eventsDisabled) return;
+	onMouseOver() {
 		this.updateText("+");
 	}
 
-	public onMouseOut() {
-		if (this.eventsDisabled) return;
+	onMouseOut() {
 		this.updateText(this.changesBuffer.toString());
-	}
-
-	private createOrUpdateElement(): HTMLElement {
-		let element = this.parent.querySelector(
-			"#git-changes-component"
-		) as HTMLElement;
-		if (!element) {
-			element = document.createElement("span");
-			element.classList.add("git-fe-component");
-			element.id = "git-changes-component";
-			this.parent.appendChild(element);
-		}
-		return element;
-	}
-
-	private addEventListeners() {
-		this.gitFEElement.addEventListener("click", this.onClick.bind(this));
-		this.gitFEElement.addEventListener(
-			"mouseover",
-			this.onMouseOver.bind(this)
-		);
-		this.gitFEElement.addEventListener(
-			"mouseout",
-			this.onMouseOut.bind(this)
-		);
 	}
 }

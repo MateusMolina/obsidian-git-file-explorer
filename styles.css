@@ -7,7 +7,7 @@
     font-size: 0.8em;
     font-weight: bold;
     transition: background-color 1s ease;
-    color: #ffffff;
+    color: #d0d0d0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,18 +20,22 @@
 }
 .git-fe-component-changes {
     background-color: #ff7f50;
+    color: #ffffff;
 }
 .git-fe-component-changes:hover {
     filter: brightness(120%);
 }
 .git-fe-component-success {
     background-color: #129060 !important;
+    color: #ffffff;
 }
 .git-fe-component-error {
     background-color: #ff4d4d !important;
+    color: #ffffff;
 }
 .git-fe-component-syncstatus {
     background-color: #126a90;
+    color: #ffffff;
     width: 5em;
 }
 .git-fe-component-syncstatus:hover {
