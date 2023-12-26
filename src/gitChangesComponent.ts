@@ -1,5 +1,5 @@
 import { GitRepository } from "./gitRepository";
-export class GitFEComponent {
+export class GitChangesComponent {
 	private parent: HTMLElement;
 	private gitRepository: GitRepository;
 	private gitFEElement: HTMLElement;
@@ -41,9 +41,9 @@ export class GitFEComponent {
 		await this.gitRepository.stageAll();
 		await this.gitRepository.commit("Sync " + new Date().toISOString());
 		this.gitFEElement.className =
-			"git-fe-component git-fe-component-committed";
+			"git-fe-component git-fe-component-success";
 		setTimeout(() => {
-			this.gitFEElement.classList.remove("git-fe-component-committed");
+			this.gitFEElement.classList.remove("git-fe-component-success");
 		}, 3000);
 
 		await this.update();
@@ -60,11 +60,13 @@ export class GitFEComponent {
 	}
 
 	private createOrUpdateElement(): HTMLElement {
-		let element = this.parent.querySelector("#counter") as HTMLElement;
+		let element = this.parent.querySelector(
+			"#git-changes-component"
+		) as HTMLElement;
 		if (!element) {
 			element = document.createElement("span");
 			element.classList.add("git-fe-component");
-			element.id = "counter";
+			element.id = "git-changes-component";
 			this.parent.appendChild(element);
 		}
 		return element;

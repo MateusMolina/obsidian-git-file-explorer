@@ -1,7 +1,8 @@
 import { FileExplorer, AFItem, TFolder, FolderItem } from "obsidian";
 import { GitRepository } from "./gitRepository";
-import { GitFEComponent } from "./gitFEComponent";
+import { GitChangesComponent } from "./gitChangesComponent";
 import { join } from "path";
+import { GitSyncComponent } from "./gitSyncComponent";
 export class FileExplorerUpdater {
 	private vaultBasePath: string;
 	private fileExplorer: FileExplorer;
@@ -23,7 +24,8 @@ export class FileExplorerUpdater {
 				return;
 			});
 
-			if (repo) new GitFEComponent(folderItem.selfEl, repo).update();
+			if (repo) new GitSyncComponent(folderItem.selfEl, repo).update();
+			if (repo) new GitChangesComponent(folderItem.selfEl, repo).update();
 		}
 	}
 

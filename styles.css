@@ -3,7 +3,7 @@
     right: 0;
     top: 0;
     padding: 0.5em;
-    border-radius: 25%;
+    border-radius: 1.5em;
     font-size: 0.8em;
     font-weight: bold;
     transition: background-color 1s ease;
@@ -13,14 +13,27 @@
     align-items: center;
     width: 2em;
     height: 1.5em;
+    margin-left: 2em;
+}
+.git-fe-component:nth-of-type(1) {
+    right: 2.5em;
 }
 .git-fe-component-changes {
-    background-color: #ff4d4d;
-}
-
-.git-fe-component-changes:hover {
     background-color: #ff7f50;
 }
-.git-fe-component-committed {
+.git-fe-component-changes:hover {
+    filter: brightness(120%);
+}
+.git-fe-component-success {
     background-color: #129060 !important;
+}
+.git-fe-component-error {
+    background-color: #ff4d4d !important;
+}
+.git-fe-component-syncstatus {
+    background-color: #126a90;
+    width: 5em;
+}
+.git-fe-component-syncstatus:hover {
+    filter: brightness(120%);
 }
