@@ -1,10 +1,10 @@
 import { GitRepository } from "./gitRepository";
 import { GitWidget } from "./gitWidget";
-export class GitChangesComponent extends GitWidget {
+export class ChangesGitWidget extends GitWidget {
 	private changesBuffer = 0;
 
 	constructor(parent: HTMLElement, gitRepository: GitRepository) {
-		super(parent, gitRepository, "git-changes-component");
+		super(parent, gitRepository, "changes-git-widget");
 	}
 
 	async update() {
@@ -15,11 +15,11 @@ export class GitChangesComponent extends GitWidget {
 		this.changesBuffer = await this.gitRepository.getChangedFilesCount();
 
 		if (this.changesBuffer) {
-			this.gitFEElement.classList.add("git-fe-component-changes");
+			this.gitFEElement.classList.add("git-widget-changes");
 			this.updateText(this.changesBuffer.toString());
 			this.enableEvents();
 		} else {
-			this.gitFEElement.classList.remove("git-fe-component-changes");
+			this.gitFEElement.classList.remove("git-widget-changes");
 			this.updateText("git");
 			this.disableEvents();
 		}
@@ -27,7 +27,7 @@ export class GitChangesComponent extends GitWidget {
 
 	async onClick() {
 		this.executeWithSuccessAnimation(async () => {
-			this.gitFEElement.removeClass("git-fe-component-changes");
+			this.gitFEElement.removeClass("git-widget-changes");
 			await this.gitRepository.stageAll();
 			await this.gitRepository.commit("Sync " + new Date().toISOString());
 		}).finally(this.update.bind(this));

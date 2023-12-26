@@ -1,8 +1,8 @@
 import { GitRepository } from "./gitRepository";
 import { GitWidget } from "./gitWidget";
-export class GitSyncComponent extends GitWidget {
+export class SyncGitWidget extends GitWidget {
 	constructor(parent: HTMLElement, gitRepository: GitRepository) {
-		super(parent, gitRepository, "git-sync-component");
+		super(parent, gitRepository, "sync-git-widget");
 	}
 
 	async update() {
@@ -17,7 +17,7 @@ export class GitSyncComponent extends GitWidget {
 				await this.gitRepository.getToPushCommitsCount();
 			const statusStr = "↑" + toPushCount + " ↓" + toPullCount;
 
-			this.gitFEElement.classList.add("git-fe-component-syncstatus");
+			this.gitFEElement.classList.add("git-widget-sync");
 			this.updateText(statusStr);
 			this.enableEvents();
 		} catch (error) {

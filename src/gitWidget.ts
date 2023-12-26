@@ -32,7 +32,7 @@ export abstract class GitWidget {
 		let element = this.parent.querySelector(`#${widgetId}`) as HTMLElement;
 		if (!element) {
 			element = document.createElement("span");
-			element.classList.add("git-fe-component");
+			element.classList.add("git-widget");
 			element.id = widgetId;
 			this.parent.appendChild(element);
 		}
@@ -43,21 +43,17 @@ export abstract class GitWidget {
 		func: () => Promise<void>
 	): Promise<void> {
 		this.disableEvents();
-		this.gitFEElement.classList.add("git-fe-component-success");
+		this.gitFEElement.classList.add("git-widget-success");
 		await func()
 			.catch((error) => {
 				console.error(error);
-				this.gitFEElement.classList.add("git-fe-component-error");
+				this.gitFEElement.classList.add("git-widget-error");
 				this.updateText("⚠");
 			})
 			.finally(() => {
 				setTimeout(() => {
-					this.gitFEElement.classList.remove(
-						"git-fe-component-error"
-					);
-					this.gitFEElement.classList.remove(
-						"git-fe-component-success"
-					);
+					this.gitFEElement.classList.remove("git-widget-error");
+					this.gitFEElement.classList.remove("git-widget-success");
 					this.enableEvents();
 				}, 3000);
 			});

@@ -1,4 +1,4 @@
-.git-fe-component {
+.git-widget {
     position: absolute;
     right: 0;
     top: 0;
@@ -15,29 +15,29 @@
     height: 1.5em;
     margin-left: 2em;
 }
-.git-fe-component:nth-of-type(1) {
+.git-widget:nth-of-type(1) {
     right: 2.5em;
 }
-.git-fe-component-changes {
+.git-widget-changes {
     background-color: #ff7f50;
     color: #ffffff;
 }
-.git-fe-component-changes:hover {
+.git-widget-changes:hover {
     filter: brightness(120%);
 }
-.git-fe-component-success {
+.git-widget-success {
     background-color: #129060 !important;
     color: #ffffff;
 }
-.git-fe-component-error {
+.git-widget-error {
     background-color: #ff4d4d !important;
     color: #ffffff;
 }
-.git-fe-component-syncstatus {
+.git-widget-sync {
     background-color: #126a90;
     color: #ffffff;
     width: 5em;
 }
-.git-fe-component-syncstatus:hover {
+.git-widget-sync:hover {
     filter: brightness(120%);
 }
