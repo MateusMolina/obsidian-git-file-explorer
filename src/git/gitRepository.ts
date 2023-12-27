@@ -1,24 +1,21 @@
-import { exec } from "child_process";
-import { existsSync } from "fs";
+import simpleGit, { SimpleGit } from "simple-git";
 import { join } from "path";
-
-// TODO find a lib to do this instead..
+import { existsSync } from "fs";
 export class GitRepository {
-	private repoAbsPath: string;
-	private remoteBranch: string;
+	private git: SimpleGit;
+	private remoteBranch: string | undefined = undefined;
 
-	private constructor(repoAbsPath: string) {
-		this.repoAbsPath = repoAbsPath;
+	private constructor(private repoAbsPath: string) {
+		this.git = simpleGit(this.repoAbsPath);
 	}
 
 	async setup() {
-		this.remoteBranch = await this.getRemoteBranch().catch(
-			() => "origin/main"
-		);
+		if (await this.hasRemote())
+			this.remoteBranch = await this.getRemoteBranch();
 	}
 
 	static async getInstance(repoAbsPath: string): Promise<GitRepository> {
-		if (!(await GitRepository.isGitRepo(repoAbsPath))) {
+		if (!GitRepository.isGitRepo(repoAbsPath)) {
 			throw new Error("Not a git repository @ " + repoAbsPath);
 		}
 
@@ -28,72 +25,74 @@ export class GitRepository {
 		return gitRepository;
 	}
 
-	static async isGitRepo(fullPath: string): Promise<boolean> {
+	static isGitRepo(fullPath: string): boolean {
 		const gitDir = join(fullPath, ".git");
 		return existsSync(gitDir);
 	}
 
 	async getChangedFilesCount(): Promise<number> {
-		const stdout = await this.executeGitCommand(
-			`status --porcelain | wc -l`
-		);
-		return parseInt(stdout, 10);
+		const status = await this.git.status();
+		return status.files.length;
 	}
 
 	async getToPullCommitsCount(): Promise<number> {
-		await this.fetchOrigin();
-		const stdout = await this.executeGitCommand(
-			`rev-list --count HEAD..${this.remoteBranch}`
-		);
-		return parseInt(stdout, 10);
+		if (!this.remoteBranch) return Promise.reject("No remote branch");
+
+		await this.git.fetch();
+		const count = await this.git.raw([
+			"rev-list",
+			"--count",
+			"HEAD..origin/" + this.remoteBranch,
+		]);
+		return parseInt(count, 10);
 	}
 
 	async getToPushCommitsCount(): Promise<number> {
-		const stdout = await this.executeGitCommand(
-			`rev-list --count ${this.remoteBranch}..HEAD`
-		);
-		return parseInt(stdout, 10);
+		if (!this.remoteBranch) return Promise.reject("No remote branch");
+
+		const count = await this.git.raw([
+			"rev-list",
+			"--count",
+			"origin/" + this.remoteBranch + "..HEAD",
+		]);
+		return parseInt(count, 10);
 	}
 
 	async stageAll(): Promise<void> {
-		await this.executeGitCommand(`add .`);
+		await this.git.add("./*");
 	}
 
 	async commit(message: string): Promise<void> {
-		await this.executeGitCommand(`commit -m "${message}"`);
+		await this.git.commit(message);
 	}
 
 	async fetchOrigin(): Promise<void> {
-		await this.executeGitCommand(`fetch origin`);
+		await this.git.fetch();
+	}
+
+	async hasRemote(): Promise<boolean> {
+		const remotes = await this.git.getRemotes();
+		return remotes.length > 0;
 	}
 
 	async getRemoteBranch(): Promise<string> {
-		const verifyBranch = async (branch: string) => {
-			return await this.executeGitCommand(
-				`show-ref --verify --quiet refs/remotes/${branch}`
-			).then(() => branch);
-		};
-
-		return await this.executeGitCommand(
-			`rev-parse --abbrev-ref --symbolic-full-name @{u}`
-		)
-			.catch(() => verifyBranch("origin/main"))
-			.catch(() => verifyBranch("origin/master"))
-			.catch(() => {
-				throw new Error("No remote branch found");
-			});
+		const branchName = await this.git.revparse(["--abbrev-ref", "HEAD"]);
+		return branchName;
 	}
 
 	async pushToOrigin(): Promise<void> {
-		await this.executeGitCommand(
-			`push ${this.remoteBranch.split("/").join(" ")}`
-		);
+		if (!this.remoteBranch) return Promise.reject("No remote branch");
+
+		await this.git.push("origin", this.remoteBranch);
 	}
 
 	async pullToOrigin(): Promise<void> {
-		await this.executeGitCommand(
-			`pull ${this.remoteBranch.split("/").join(" ")} --no-edit --rebase`
-		);
+		if (!this.remoteBranch) return Promise.reject("No remote branch");
+
+		await this.git.pull("origin", this.remoteBranch, [
+			"--no-edit",
+			"--no-rebase",
+		]);
 	}
 
 	async sync(): Promise<void> {
@@ -101,18 +100,9 @@ export class GitRepository {
 		await this.pushToOrigin();
 	}
 
-	private async executeGitCommand(cmd: string): Promise<string> {
-		return new Promise((resolve, reject) => {
-			exec(
-				`git -C ${this.repoAbsPath} ` + cmd,
-				(error, stdout, stderr) => {
-					if (error) {
-						reject(error + ", with error " + stderr);
-					} else {
-						resolve(stdout.trim());
-					}
-				}
-			);
-		});
+	async backup(commitMsg = ""): Promise<void> {
+		if (!commitMsg) commitMsg = "Backup @ " + new Date().toISOString();
+		await this.stageAll();
+		await this.commit(commitMsg);
 	}
 }

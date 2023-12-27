@@ -26,8 +26,7 @@ export class ChangesGitWidget extends GitWidget {
 	async onClick() {
 		await this.executeWithSuccessAnimation(async () => {
 			this.gitFEElement.removeClass("git-widget-changes");
-			await this.gitRepository.stageAll();
-			await this.gitRepository.commit("Sync " + new Date().toISOString());
+			await this.gitRepository.backup();
 		}).finally(this.update);
 	}
 
