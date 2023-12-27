@@ -1,4 +1,4 @@
-import { GitRepository } from "./gitRepository";
+import { GitRepository } from "../git/gitRepository";
 import { GitWidget } from "./gitWidget";
 export class ChangesGitWidget extends GitWidget {
 	private changesBuffer = 0;

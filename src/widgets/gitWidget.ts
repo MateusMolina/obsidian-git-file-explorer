@@ -1,4 +1,4 @@
-import { GitRepository } from "./gitRepository";
+import { GitRepository } from "../git/gitRepository";
 
 export abstract class GitWidget {
 	protected parent: HTMLElement;

@@ -1,8 +1,8 @@
 import { FileExplorer, AFItem, TFolder, FolderItem } from "obsidian";
-import { GitRepository } from "./gitRepository";
-import { ChangesGitWidget } from "./changesGitWidget";
+import { GitRepository } from "./git/gitRepository";
+import { ChangesGitWidget } from "./widgets/changesGitWidget";
 import { join } from "path";
-import { SyncGitWidget } from "./syncGitWidget";
+import { SyncGitWidget } from "./widgets/syncGitWidget";
 export class FileExplorerUpdater {
 	private vaultBasePath: string;
 	private fileExplorer: FileExplorer;

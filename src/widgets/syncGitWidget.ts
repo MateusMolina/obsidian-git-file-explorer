@@ -1,4 +1,4 @@
-import { GitRepository } from "./gitRepository";
+import { GitRepository } from "../git/gitRepository";
 import { GitWidget } from "./gitWidget";
 export class SyncGitWidget extends GitWidget {
 	constructor(parent: HTMLElement, gitRepository: GitRepository) {
