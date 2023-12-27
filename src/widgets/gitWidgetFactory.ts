@@ -1,6 +1,7 @@
 import { GitRepository } from "../git/gitRepository";
 import { ChangesGitWidget } from "./changesGitWidget";
 import { SyncGitWidget } from "./syncGitWidget";
+import { Widget } from "./widget";
 
 export class GitWidgetFactory {
 	private gitRepository: GitRepository;
@@ -20,11 +21,15 @@ export class GitWidgetFactory {
 		return new GitWidgetFactory(parent, gitRepository);
 	}
 
-	createChangesGitWidget(): ChangesGitWidget {
+	createWidgetsBundle(): Widget[] {
+		return [this.createSyncGitWidget(), this.createChangesGitWidget()];
+	}
+
+	private createChangesGitWidget(): ChangesGitWidget {
 		return new ChangesGitWidget(this.parent, this.gitRepository);
 	}
 
-	createSyncGitWidget(): SyncGitWidget {
+	private createSyncGitWidget(): SyncGitWidget {
 		return new SyncGitWidget(this.parent, this.gitRepository);
 	}
 }

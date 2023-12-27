@@ -3,10 +3,7 @@ import { GitWidget } from "./gitWidget";
 export class SyncGitWidget extends GitWidget {
 	constructor(parent: HTMLElement, gitRepository: GitRepository) {
 		super(parent, gitRepository, "sync-git-widget");
-	}
-
-	async update() {
-		if (this.updateEnabled) await this.updateSyncStatus();
+		this.updateCallbacks.push(this.updateSyncStatus.bind(this));
 	}
 
 	async updateSyncStatus() {
@@ -26,7 +23,7 @@ export class SyncGitWidget extends GitWidget {
 	}
 
 	async onClick() {
-		this.executeWithSuccessAnimation(
+		await this.executeWithSuccessAnimation(
 			this.gitRepository.sync.bind(this.gitRepository)
 		).finally(this.update);
 	}

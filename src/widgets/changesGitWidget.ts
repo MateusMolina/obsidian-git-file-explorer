@@ -5,10 +5,7 @@ export class ChangesGitWidget extends GitWidget {
 
 	constructor(parent: HTMLElement, gitRepository: GitRepository) {
 		super(parent, gitRepository, "changes-git-widget");
-	}
-
-	async update() {
-		if (this.updateEnabled) await this.updateChanges();
+		this.updateCallbacks.push(this.updateChanges.bind(this));
 	}
 
 	async updateChanges() {
@@ -18,7 +15,6 @@ export class ChangesGitWidget extends GitWidget {
 			this.changesBuffer = changesBuffer;
 			this.gitFEElement.classList.add("git-widget-changes");
 			this.updateText(this.changesBuffer.toString());
-			console.log("enabling");
 			this.enableEvents();
 		} else {
 			this.gitFEElement.classList.remove("git-widget-changes");
@@ -28,7 +24,7 @@ export class ChangesGitWidget extends GitWidget {
 	}
 
 	async onClick() {
-		this.executeWithSuccessAnimation(async () => {
+		await this.executeWithSuccessAnimation(async () => {
 			this.gitFEElement.removeClass("git-widget-changes");
 			await this.gitRepository.stageAll();
 			await this.gitRepository.commit("Sync " + new Date().toISOString());

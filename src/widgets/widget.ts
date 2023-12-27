@@ -6,4 +6,5 @@ export interface Widget {
 	disableUpdate(): void;
 	enableEvents(): void;
 	disableEvents(): void;
+	getParent(): HTMLElement;
 }
