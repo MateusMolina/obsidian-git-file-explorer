@@ -12,9 +12,10 @@ export class ChangesGitWidget extends GitWidget {
 	}
 
 	async updateChanges() {
-		this.changesBuffer = await this.gitRepository.getChangedFilesCount();
+		const changesBuffer = await this.gitRepository.getChangedFilesCount();
 
-		if (this.changesBuffer) {
+		if (changesBuffer) {
+			this.changesBuffer = changesBuffer;
 			this.gitFEElement.classList.add("git-widget-changes");
 			this.updateText(this.changesBuffer.toString());
 			this.enableEvents();
@@ -30,7 +31,7 @@ export class ChangesGitWidget extends GitWidget {
 			this.gitFEElement.removeClass("git-widget-changes");
 			await this.gitRepository.stageAll();
 			await this.gitRepository.commit("Sync " + new Date().toISOString());
-		}).finally(this.update.bind(this));
+		}).finally(this.update);
 	}
 
 	onMouseOver() {

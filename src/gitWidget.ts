@@ -4,7 +4,7 @@ export abstract class GitWidget {
 	protected parent: HTMLElement;
 	protected gitRepository: GitRepository;
 	protected gitFEElement: HTMLElement;
-	protected eventsEnabled = true;
+	protected eventsEnabled = false;
 
 	constructor(
 		parent: HTMLElement,
@@ -14,6 +14,10 @@ export abstract class GitWidget {
 		this.parent = parent;
 		this.gitRepository = gitRepository;
 		this.gitFEElement = this.createOrUpdateElement(widgetId);
+		this.update = this.update.bind(this);
+		this.onClick = this.onClick.bind(this);
+		this.onMouseOver = this.onMouseOver.bind(this);
+		this.onMouseOut = this.onMouseOut.bind(this);
 		this.addEventListeners();
 	}
 
@@ -54,29 +58,28 @@ export abstract class GitWidget {
 				setTimeout(() => {
 					this.gitFEElement.classList.remove("git-widget-error");
 					this.gitFEElement.classList.remove("git-widget-success");
-					this.enableEvents();
 				}, 3000);
 			});
 	}
 
 	protected guardFunction(fun: () => void) {
 		return () => {
-			if (fun && this.eventsEnabled) fun.bind(this).call();
+			if (fun && this.eventsEnabled) fun();
 		};
 	}
 
 	protected addEventListeners() {
 		this.gitFEElement.addEventListener(
 			"click",
-			this.guardFunction(this.onClick).bind(this)
+			this.guardFunction(this.onClick)
 		);
 		this.gitFEElement.addEventListener(
 			"mouseover",
-			this.guardFunction(this.onMouseOver).bind(this)
+			this.guardFunction(this.onMouseOver)
 		);
 		this.gitFEElement.addEventListener(
 			"mouseout",
-			this.guardFunction(this.onMouseOut).bind(this)
+			this.guardFunction(this.onMouseOut)
 		);
 	}
 

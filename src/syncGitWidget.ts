@@ -28,10 +28,10 @@ export class SyncGitWidget extends GitWidget {
 	async onClick() {
 		this.executeWithSuccessAnimation(
 			this.gitRepository.sync.bind(this.gitRepository)
-		).finally(this.update.bind(this));
+		).finally(this.update);
 	}
 
-	onMouseOver = () => {};
+	onMouseOver() {}
 
-	onMouseOut = () => {};
+	onMouseOut() {}
 }
