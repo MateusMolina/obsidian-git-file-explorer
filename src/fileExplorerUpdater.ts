@@ -1,9 +1,7 @@
 import { FileExplorer, AFItem, TFolder, FolderItem } from "obsidian";
-import { GitRepository } from "./git/gitRepository";
-import { ChangesGitWidget } from "./widgets/changesGitWidget";
 import { join } from "path";
-import { SyncGitWidget } from "./widgets/syncGitWidget";
-export class FileExplorerUpdater {
+import { GitWidgetFactory } from "./widgets/gitWidgetFactory";
+export class FileExplorerHandler {
 	private vaultBasePath: string;
 	private fileExplorer: FileExplorer;
 
@@ -13,28 +11,25 @@ export class FileExplorerUpdater {
 	}
 
 	public async updateFileExplorer() {
-		const folderItems = Object.values(this.fileExplorer.fileItems).filter(
-			this.isFolder
-		) as FolderItem[];
-
-		for (const folderItem of folderItems) {
-			const repo = await GitRepository.getInstance(
-				this.getFullPathFromFolderItem(folderItem)
-			).catch((error) => {
-				return;
-			});
-
-			if (repo) new SyncGitWidget(folderItem.selfEl, repo).update();
-			if (repo) new ChangesGitWidget(folderItem.selfEl, repo).update();
-		}
+		this.doWithFolderItem((f) =>
+			GitWidgetFactory.getInstance(f.selfEl, this.getFullPathToItem(f))
+				.then((factory) => {
+					factory.createSyncGitWidget().update();
+					factory.createChangesGitWidget().update();
+				})
+				.catch((err) => {})
+		);
 	}
+
+	doWithFolderItem = (func: (f: FolderItem) => void) =>
+		Object.values(this.fileExplorer.fileItems)
+			.filter(this.isFolder)
+			.forEach(func);
 
 	private isFolder = (item: AFItem): item is FolderItem =>
 		(item as FolderItem).file instanceof TFolder;
 
-	private getFullPathFromFolderItem(folderItem: FolderItem): string {
-		const folder = folderItem.file as TFolder;
-		return join(this.vaultBasePath, folder.path);
+	private getFullPathToItem(item: AFItem): string {
+		return join(this.vaultBasePath, item.file.path);
 	}
 }
-

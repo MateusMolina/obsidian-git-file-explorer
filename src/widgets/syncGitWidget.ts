@@ -6,7 +6,7 @@ export class SyncGitWidget extends GitWidget {
 	}
 
 	async update() {
-		await this.updateSyncStatus();
+		if (this.updateEnabled) await this.updateSyncStatus();
 	}
 
 	async updateSyncStatus() {
@@ -31,7 +31,7 @@ export class SyncGitWidget extends GitWidget {
 		).finally(this.update);
 	}
 
-	onMouseOver() {}
+	protected onMouseOver() {}
 
-	onMouseOut() {}
+	protected onMouseOut() {}
 }

@@ -1,19 +1,17 @@
 import { GitRepository } from "../git/gitRepository";
+import { Widget } from "./widget";
 
-export abstract class GitWidget {
-	protected parent: HTMLElement;
-	protected gitRepository: GitRepository;
+export abstract class GitWidget implements Widget {
 	protected gitFEElement: HTMLElement;
 	protected eventsEnabled = false;
+	protected updateEnabled = true;
 
 	constructor(
-		parent: HTMLElement,
-		gitRepository: GitRepository,
-		widgetId: string
+		protected parent: HTMLElement,
+		protected gitRepository: GitRepository,
+		public widgetId: string
 	) {
-		this.parent = parent;
-		this.gitRepository = gitRepository;
-		this.gitFEElement = this.createOrUpdateElement(widgetId);
+		this.install(widgetId);
 		this.update = this.update.bind(this);
 		this.onClick = this.onClick.bind(this);
 		this.onMouseOver = this.onMouseOver.bind(this);
@@ -21,18 +19,18 @@ export abstract class GitWidget {
 		this.addEventListeners();
 	}
 
-	public updateText = (text: string) =>
+	protected updateText = (text: string) =>
 		(this.gitFEElement.textContent = text);
 
 	abstract update(): Promise<void>;
 
-	abstract onClick(): Promise<void>;
+	protected abstract onClick(): Promise<void>;
 
-	abstract onMouseOver(): void;
+	protected abstract onMouseOver(): void;
 
-	abstract onMouseOut(): void;
+	protected abstract onMouseOut(): void;
 
-	private createOrUpdateElement(widgetId: string): HTMLElement {
+	install(widgetId: string): void {
 		let element = this.parent.querySelector(`#${widgetId}`) as HTMLElement;
 		if (!element) {
 			element = document.createElement("span");
@@ -40,7 +38,11 @@ export abstract class GitWidget {
 			element.id = widgetId;
 			this.parent.appendChild(element);
 		}
-		return element;
+		this.gitFEElement = element;
+	}
+
+	uninstall() {
+		this.gitFEElement.remove();
 	}
 
 	protected async executeWithSuccessAnimation(
@@ -83,11 +85,21 @@ export abstract class GitWidget {
 		);
 	}
 
-	enableEvents = () => {
-		this.eventsEnabled = true;
-	};
+	enableUpdate(): void {
+		this.updateEnabled = true;
+	}
 
-	disableEvents = () => {
+	disableUpdate(): void {
+		this.updateEnabled = false;
+	}
+
+	enableEvents(): void {
+		console.log("enabling");
+		this.eventsEnabled = true;
+	}
+
+	disableEvents(): void {
+		console.log("disabling");
 		this.eventsEnabled = false;
-	};
+	}
 }

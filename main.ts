@@ -1,5 +1,5 @@
 import { Plugin, FileExplorer, FileSystemAdapter } from "obsidian";
-import { FileExplorerUpdater } from "./src/fileExplorerUpdater";
+import { FileExplorerHandler } from "./src/fileExplorerUpdater";
 
 interface GitFileExplorerPluginSettings {
 	mySetting: string;
@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS: GitFileExplorerPluginSettings = {
 };
 export default class GitFileExplorerPlugin extends Plugin {
 	fileExplorer?: FileExplorer | null;
-	fileExplorerUpdater: FileExplorerUpdater;
+	fileExplorerUpdater: FileExplorerHandler;
 	settings: GitFileExplorerPluginSettings;
 
 	async onload() {
@@ -23,7 +23,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 		if (!this.fileExplorer) return;
 
-		this.fileExplorerUpdater = new FileExplorerUpdater(
+		this.fileExplorerUpdater = new FileExplorerHandler(
 			this.getVaultBasePath(),
 			this.fileExplorer
 		);

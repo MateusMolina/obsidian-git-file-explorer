@@ -8,7 +8,7 @@ export class ChangesGitWidget extends GitWidget {
 	}
 
 	async update() {
-		await this.updateChanges();
+		if (this.updateEnabled) await this.updateChanges();
 	}
 
 	async updateChanges() {
@@ -18,6 +18,7 @@ export class ChangesGitWidget extends GitWidget {
 			this.changesBuffer = changesBuffer;
 			this.gitFEElement.classList.add("git-widget-changes");
 			this.updateText(this.changesBuffer.toString());
+			console.log("enabling");
 			this.enableEvents();
 		} else {
 			this.gitFEElement.classList.remove("git-widget-changes");
@@ -34,11 +35,11 @@ export class ChangesGitWidget extends GitWidget {
 		}).finally(this.update);
 	}
 
-	onMouseOver() {
+	protected onMouseOver() {
 		this.updateText("+");
 	}
 
-	onMouseOut() {
+	protected onMouseOut() {
 		this.updateText(this.changesBuffer.toString());
 	}
 }

@@ -19,7 +19,7 @@ export class GitRepository {
 
 	static async getInstance(repoAbsPath: string): Promise<GitRepository> {
 		if (!(await GitRepository.isGitRepo(repoAbsPath))) {
-			throw new Error("Not a git repository");
+			throw new Error("Not a git repository @ " + repoAbsPath);
 		}
 
 		const gitRepository = new GitRepository(repoAbsPath);
