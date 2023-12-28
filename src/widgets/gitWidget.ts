@@ -6,7 +6,6 @@ export abstract class GitWidget implements Widget {
 	protected eventsEnabled = false;
 	protected updateEnabled = true;
 	protected updateCallbacks: (() => Promise<void>)[] = [];
-	private updateQueue = 0;
 
 	constructor(
 		protected parent: HTMLElement,
@@ -29,20 +28,13 @@ export abstract class GitWidget implements Widget {
 		(this.gitFEElement.textContent = text);
 
 	async update(): Promise<void> {
-		this.updateQueue++;
-		if (!this.updateEnabled) return;
+		if (this.updateEnabled) await this.updateNow();
+	}
 
-		this.disableUpdate();
-
+	private async updateNow() {
 		await Promise.all([
 			...this.updateCallbacks.map((callback) => callback()),
-			new Promise((resolve) => setTimeout(resolve, 3000)),
-		]).finally(() => this.enableUpdate());
-
-		if (this.updateQueue > 0) {
-			this.updateQueue = 0;
-			await this.update();
-		}
+		]);
 	}
 
 	protected abstract onClick(): Promise<void>;

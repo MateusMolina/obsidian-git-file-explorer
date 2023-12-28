@@ -2,21 +2,31 @@ import { FileExplorerHandler } from "../fileExplorerHandler";
 import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
 import { FolderItem } from "obsidian";
+import { Debouncer } from "./utils/debouncer";
 
 export class WidgetManager {
 	private widgets: Widget[] = [];
+	private debouncer: Debouncer = new Debouncer(3000);
 
 	constructor(private fileExplorerHandler: FileExplorerHandler) {
 		this.update = this.update.bind(this);
 	}
 
 	public async update(): Promise<void> {
+		this.debouncer.debounceAndRunWhenIdle(this.updateNow.bind(this));
+	}
+
+	private async updateNow() {
 		await this.addWidgetsForNewFolderItems();
 		await this.updateExistingWidgets();
 	}
 
-	private updateExistingWidgets = async () =>
-		await Promise.all(this.widgets.map((w) => w.update()));
+	private updateExistingWidgets = async () => {
+		for (const widget of this.widgets) {
+			await widget.update();
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		}
+	};
 
 	private addWidgetsForNewFolderItems = async () =>
 		this.fileExplorerHandler.doWithFolderItem(async (folderItem) => {
