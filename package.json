@@ -1,6 +1,6 @@
 {
 	"name": "git-file-explorer",
-	"version": "0.2.1",
+	"version": "0.3.0",
 	"description": "Add relevant git information to detected git repostitories in the file explorer.",
 	"main": "main.js",
 	"scripts": {
