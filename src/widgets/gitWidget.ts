@@ -2,7 +2,7 @@ import { GitRepository } from "../git/gitRepository";
 import { Widget } from "./widget";
 
 export abstract class GitWidget implements Widget {
-	protected gitFEElement: HTMLElement;
+	protected widgetEl: HTMLElement;
 	protected eventsEnabled = false;
 	protected updateEnabled = true;
 	protected updateCallbacks: (() => Promise<void>)[] = [];
@@ -24,8 +24,7 @@ export abstract class GitWidget implements Widget {
 		return this.parent;
 	}
 
-	protected updateText = (text: string) =>
-		(this.gitFEElement.textContent = text);
+	protected updateText = (text: string) => (this.widgetEl.textContent = text);
 
 	async update(): Promise<void> {
 		if (this.updateEnabled) await this.updateNow();
@@ -51,28 +50,28 @@ export abstract class GitWidget implements Widget {
 			element.id = widgetId;
 			this.parent.appendChild(element);
 		}
-		this.gitFEElement = element;
+		this.widgetEl = element;
 	}
 
 	uninstall() {
-		this.gitFEElement.remove();
+		this.widgetEl.remove();
 	}
 
 	protected async executeWithSuccessAnimation(
 		func: () => Promise<void>
 	): Promise<void> {
 		this.disableEvents();
-		this.gitFEElement.classList.add("git-widget-success");
+		this.widgetEl.classList.add("git-widget-success");
 		await func()
 			.catch((error) => {
 				console.error(error);
-				this.gitFEElement.classList.add("git-widget-error");
+				this.widgetEl.classList.add("git-widget-error");
 				this.updateText("⚠");
 			})
 			.finally(() => {
 				setTimeout(() => {
-					this.gitFEElement.classList.remove("git-widget-error");
-					this.gitFEElement.classList.remove("git-widget-success");
+					this.widgetEl.classList.remove("git-widget-error");
+					this.widgetEl.classList.remove("git-widget-success");
 				}, 3000);
 			});
 	}
@@ -84,15 +83,15 @@ export abstract class GitWidget implements Widget {
 	}
 
 	protected addEventListeners() {
-		this.gitFEElement.addEventListener(
+		this.widgetEl.addEventListener(
 			"click",
 			this.guardFunction(this.onClick)
 		);
-		this.gitFEElement.addEventListener(
+		this.widgetEl.addEventListener(
 			"mouseover",
 			this.guardFunction(this.onMouseOver)
 		);
-		this.gitFEElement.addEventListener(
+		this.widgetEl.addEventListener(
 			"mouseout",
 			this.guardFunction(this.onMouseOut)
 		);

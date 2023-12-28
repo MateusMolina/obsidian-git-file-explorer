@@ -13,11 +13,11 @@ export class ChangesGitWidget extends GitWidget {
 
 		if (changesBuffer) {
 			this.changesBuffer = changesBuffer;
-			this.gitFEElement.classList.add("git-widget-changes");
+			this.widgetEl.classList.add("git-widget-changes");
 			this.updateText(this.changesBuffer.toString());
 			this.enableEvents();
 		} else {
-			this.gitFEElement.classList.remove("git-widget-changes");
+			this.widgetEl.classList.remove("git-widget-changes");
 			this.updateText("git");
 			this.disableEvents();
 		}
@@ -25,7 +25,7 @@ export class ChangesGitWidget extends GitWidget {
 
 	async onClick() {
 		await this.executeWithSuccessAnimation(async () => {
-			this.gitFEElement.removeClass("git-widget-changes");
+			this.widgetEl.removeClass("git-widget-changes");
 			await this.gitRepository.backup();
 		}).finally(this.update);
 	}

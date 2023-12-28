@@ -14,7 +14,7 @@ export class SyncGitWidget extends GitWidget {
 				await this.gitRepository.getToPushCommitsCount();
 			const statusStr = "↑" + toPushCount + " ↓" + toPullCount;
 
-			this.gitFEElement.classList.add("git-widget-sync");
+			this.widgetEl.classList.add("git-widget-sync");
 			this.updateText(statusStr);
 			this.enableEvents();
 		} catch (error) {
