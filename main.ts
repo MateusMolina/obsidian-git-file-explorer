@@ -30,7 +30,10 @@ export default class GitFileExplorerPlugin extends Plugin {
 			this.fileExplorer
 		);
 
-		this.widgetManager = new WidgetManager(this.fileExplorerHandler);
+		this.widgetManager = new WidgetManager(
+			this.app,
+			this.fileExplorerHandler
+		);
 
 		await this.widgetManager.update();
 

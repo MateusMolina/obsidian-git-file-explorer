@@ -1,14 +1,17 @@
 import { FileExplorerHandler } from "../fileExplorerHandler";
 import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
-import { FolderItem } from "obsidian";
+import { App, FolderItem } from "obsidian";
 import { Debouncer } from "./utils/debouncer";
 
 export class WidgetManager {
 	private widgets: Widget[] = [];
 	private debouncer: Debouncer = new Debouncer(3000);
 
-	constructor(private fileExplorerHandler: FileExplorerHandler) {
+	constructor(
+		private app: App,
+		private fileExplorerHandler: FileExplorerHandler
+	) {
 		this.update = this.update.bind(this);
 	}
 
@@ -44,6 +47,7 @@ export class WidgetManager {
 	): Promise<void> {
 		try {
 			const factory = await GitWidgetFactory.getInstance(
+				this.app,
 				folderItem.selfEl,
 				this.fileExplorerHandler.getFullPathToItem(folderItem)
 			);

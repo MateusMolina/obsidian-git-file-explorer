@@ -1,3 +1,4 @@
+import { App } from "obsidian";
 import { GitRepository } from "../git/gitRepository";
 import { ChangesGitWidget } from "./changesGitWidget";
 import { SyncGitWidget } from "./syncGitWidget";
@@ -7,6 +8,7 @@ export class GitWidgetFactory {
 	private gitRepository: GitRepository;
 
 	private constructor(
+		private app: App,
 		private parent: HTMLElement,
 		gitRepository: GitRepository
 	) {
@@ -14,11 +16,12 @@ export class GitWidgetFactory {
 	}
 
 	static async getInstance(
+		app: App,
 		parent: HTMLElement,
 		repoAbsPath: string
 	): Promise<GitWidgetFactory> {
 		const gitRepository = await GitRepository.getInstance(repoAbsPath);
-		return new GitWidgetFactory(parent, gitRepository);
+		return new GitWidgetFactory(app, parent, gitRepository);
 	}
 
 	createWidgetsBundle(): Widget[] {
@@ -26,7 +29,7 @@ export class GitWidgetFactory {
 	}
 
 	private createChangesGitWidget(): ChangesGitWidget {
-		return new ChangesGitWidget(this.parent, this.gitRepository);
+		return new ChangesGitWidget(this.parent, this.gitRepository, this.app);
 	}
 
 	private createSyncGitWidget(): SyncGitWidget {
