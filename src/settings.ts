@@ -1,3 +1,4 @@
+import { link } from "fs";
 import GitFileExplorerPlugin from "./../main";
 import { App, PluginSettingTab, Setting } from "obsidian";
 
@@ -22,6 +23,17 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
+		new Setting(containerEl)
+			.setName("Git changes widget active")
+			.setHeading()
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.gitChangesWidgetActive)
+					.onChange(async (value) => {
+						this.plugin.settings.gitChangesWidgetActive = value;
+						await this.plugin.saveSettings();
+					})
+			);
 
 		new Setting(containerEl)
 			.setName("Prompt commit message")
@@ -35,18 +47,8 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Git changes widget active")
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.gitChangesWidgetActive)
-					.onChange(async (value) => {
-						this.plugin.settings.gitChangesWidgetActive = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
 			.setName("Git sync widget active")
+			.setHeading()
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.gitSyncWidgetActive)
@@ -55,5 +57,15 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+
+		containerEl.createEl("p").innerHTML =
+			"<i>Changes require restarting Obsidian</i>";
+
+		this.containerEl.createEl("h2", {
+			text: "About",
+		});
+
+		containerEl.createEl("p").innerHTML =
+			"Made with ☕ by <a href='https://mateusmolina.github.io'>Mateus Molina</a>";
 	}
 }

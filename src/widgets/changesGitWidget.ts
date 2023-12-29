@@ -7,7 +7,8 @@ export class ChangesGitWidget extends GitWidget {
 	constructor(
 		parent: HTMLElement,
 		gitRepository: GitRepository,
-		private app: App
+		private app: App,
+		private promptCommitMsg = false
 	) {
 		super(parent, gitRepository, "changes-git-widget");
 		this.updateCallbacks.push(this.updateChanges.bind(this));
@@ -29,13 +30,22 @@ export class ChangesGitWidget extends GitWidget {
 	}
 
 	async onClick() {
-		new CommitMsgModal(this.app, async (commitMsg) => {
-			await this.executeWithSuccessAnimation(async () => {
-				this.widgetEl.removeClass("git-widget-changes");
-				await this.gitRepository.backup(commitMsg);
-			}).finally(this.update);
-		}).open();
+		if (!this.promptCommitMsg) {
+			await this.backupChanges();
+			return;
+		}
+
+		new CommitMsgModal(
+			this.app,
+			async (commitMsg) => await this.backupChanges(commitMsg)
+		).open();
 	}
+
+	private backupChanges = async (commitMsg = "") =>
+		this.executeWithSuccessAnimation(async () => {
+			this.widgetEl.removeClass("git-widget-changes");
+			await this.gitRepository.backup(commitMsg);
+		}).finally(this.update);
 
 	protected onMouseOver() {
 		this.updateText("+");

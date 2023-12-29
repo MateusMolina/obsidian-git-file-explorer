@@ -3,9 +3,13 @@ import { GitRepository } from "../git/gitRepository";
 import { ChangesGitWidget } from "./changesGitWidget";
 import { SyncGitWidget } from "./syncGitWidget";
 import { Widget } from "./widget";
+import { GitFileExplorerPluginSettings } from "src/settings";
 
 export class GitWidgetFactory {
-	constructor(private app: App) {}
+	constructor(
+		private app: App,
+		private settings: GitFileExplorerPluginSettings
+	) {}
 
 	async buildWidgets(
 		parent: HTMLElement,
@@ -14,10 +18,17 @@ export class GitWidgetFactory {
 		try {
 			const gitRepository = await GitRepository.getInstance(repoAbsPath);
 
-			return [
-				this.createSyncGitWidget(parent, gitRepository),
-				this.createChangesGitWidget(parent, gitRepository),
-			];
+			const widgets = [];
+
+			if (this.settings.gitSyncWidgetActive)
+				widgets.push(this.createSyncGitWidget(parent, gitRepository));
+
+			if (this.settings.gitChangesWidgetActive)
+				widgets.push(
+					this.createChangesGitWidget(parent, gitRepository)
+				);
+
+			return widgets;
 		} catch (err) {
 			return [];
 		}
@@ -27,7 +38,12 @@ export class GitWidgetFactory {
 		parent: HTMLElement,
 		repo: GitRepository
 	): ChangesGitWidget {
-		return new ChangesGitWidget(parent, repo, this.app);
+		return new ChangesGitWidget(
+			parent,
+			repo,
+			this.app,
+			this.settings.promptCommitMsg
+		);
 	}
 
 	private createSyncGitWidget(

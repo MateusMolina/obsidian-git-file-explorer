@@ -26,7 +26,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 		if (!this.fileExplorerHandler.fileExplorer) return;
 
 		this.widgetManager = new WidgetManager(
-			new GitWidgetFactory(this.app),
+			new GitWidgetFactory(this.app, this.settings),
 			this.fileExplorerHandler,
 			this.getVaultBasePath()
 		);
@@ -50,7 +50,6 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		this.initialize();
 	}
 
 	private getVaultBasePath(): string {
