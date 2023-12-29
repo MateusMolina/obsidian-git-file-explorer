@@ -21,6 +21,9 @@ export class WidgetManager {
 		this.debouncer.debounceAndRunWhenIdle(this.updateNow.bind(this));
 	}
 
+	public uninstallAll = () =>
+		this.widgets.forEach((widget) => widget.uninstall());
+
 	private async updateNow() {
 		await this.addWidgetsForNewFolderItems();
 		await this.updateExistingWidgets();

@@ -9,10 +9,8 @@ import {
 } from "./src/settings";
 
 export default class GitFileExplorerPlugin extends Plugin {
-	fileExplorer?: FileExplorer | null;
-	fileExplorerHandler: FileExplorerHandler;
-	widgetManager: WidgetManager;
 	settings: GitFileExplorerPluginSettings;
+	widgetManager: WidgetManager;
 
 	async onload() {
 		await this.loadSettings();
@@ -21,13 +19,13 @@ export default class GitFileExplorerPlugin extends Plugin {
 	}
 
 	initialize = async () => {
-		this.fileExplorerHandler = new FileExplorerHandler(this.app);
+		const fileExplorerHandler = new FileExplorerHandler(this.app);
 
-		if (!this.fileExplorerHandler.fileExplorer) return;
+		if (!fileExplorerHandler.fileExplorer) return;
 
 		this.widgetManager = new WidgetManager(
 			new GitWidgetFactory(this.app, this.settings),
-			this.fileExplorerHandler,
+			fileExplorerHandler,
 			this.getVaultBasePath()
 		);
 
@@ -38,6 +36,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 	onunload() {
 		console.log("Unloading GitFileExplorerPlugin");
+		this.widgetManager.uninstallAll();
 	}
 
 	async loadSettings() {
