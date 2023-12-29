@@ -2,14 +2,12 @@ import { Plugin, FileExplorer, FileSystemAdapter } from "obsidian";
 import { FileExplorerHandler } from "./src/fileExplorerHandler";
 import { WidgetManager } from "src/widgets/widgetManager";
 import { GitWidgetFactory } from "src/widgets/gitWidgetFactory";
+import {
+	DEFAULT_SETTINGS,
+	GitFileExplorerPluginSettings,
+	GitFileExplorerSettingTab,
+} from "./src/settings";
 
-interface GitFileExplorerPluginSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: GitFileExplorerPluginSettings = {
-	mySetting: "default",
-};
 export default class GitFileExplorerPlugin extends Plugin {
 	fileExplorer?: FileExplorer | null;
 	fileExplorerHandler: FileExplorerHandler;
@@ -18,6 +16,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		this.addSettingTab(new GitFileExplorerSettingTab(this.app, this));
 		this.app.workspace.onLayoutReady(this.initialize);
 	}
 
@@ -51,6 +50,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.initialize();
 	}
 
 	private getVaultBasePath(): string {
