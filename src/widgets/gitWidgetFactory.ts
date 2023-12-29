@@ -5,34 +5,35 @@ import { SyncGitWidget } from "./syncGitWidget";
 import { Widget } from "./widget";
 
 export class GitWidgetFactory {
-	private gitRepository: GitRepository;
+	constructor(private app: App) {}
 
-	private constructor(
-		private app: App,
-		private parent: HTMLElement,
-		gitRepository: GitRepository
-	) {
-		this.gitRepository = gitRepository;
-	}
-
-	static async getInstance(
-		app: App,
+	async buildWidgets(
 		parent: HTMLElement,
 		repoAbsPath: string
-	): Promise<GitWidgetFactory> {
-		const gitRepository = await GitRepository.getInstance(repoAbsPath);
-		return new GitWidgetFactory(app, parent, gitRepository);
+	): Promise<Widget[]> {
+		try {
+			const gitRepository = await GitRepository.getInstance(repoAbsPath);
+
+			return [
+				this.createSyncGitWidget(parent, gitRepository),
+				this.createChangesGitWidget(parent, gitRepository),
+			];
+		} catch (err) {
+			return [];
+		}
 	}
 
-	createWidgetsBundle(): Widget[] {
-		return [this.createSyncGitWidget(), this.createChangesGitWidget()];
+	private createChangesGitWidget(
+		parent: HTMLElement,
+		repo: GitRepository
+	): ChangesGitWidget {
+		return new ChangesGitWidget(parent, repo, this.app);
 	}
 
-	private createChangesGitWidget(): ChangesGitWidget {
-		return new ChangesGitWidget(this.parent, this.gitRepository, this.app);
-	}
-
-	private createSyncGitWidget(): SyncGitWidget {
-		return new SyncGitWidget(this.parent, this.gitRepository);
+	private createSyncGitWidget(
+		parent: HTMLElement,
+		repo: GitRepository
+	): SyncGitWidget {
+		return new SyncGitWidget(parent, repo);
 	}
 }

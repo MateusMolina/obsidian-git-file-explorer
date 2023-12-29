@@ -1,6 +1,7 @@
 import { Plugin, FileExplorer, FileSystemAdapter } from "obsidian";
 import { FileExplorerHandler } from "./src/fileExplorerHandler";
 import { WidgetManager } from "src/widgets/widgetManager";
+import { GitWidgetFactory } from "src/widgets/gitWidgetFactory";
 
 interface GitFileExplorerPluginSettings {
 	mySetting: string;
@@ -21,18 +22,14 @@ export default class GitFileExplorerPlugin extends Plugin {
 	}
 
 	initialize = async () => {
-		this.fileExplorer = this.retrieveFileExplorer();
+		this.fileExplorerHandler = new FileExplorerHandler(this.app);
 
-		if (!this.fileExplorer) return;
-
-		this.fileExplorerHandler = new FileExplorerHandler(
-			this.getVaultBasePath(),
-			this.fileExplorer
-		);
+		if (!this.fileExplorerHandler.fileExplorer) return;
 
 		this.widgetManager = new WidgetManager(
-			this.app,
-			this.fileExplorerHandler
+			new GitWidgetFactory(this.app),
+			this.fileExplorerHandler,
+			this.getVaultBasePath()
 		);
 
 		await this.widgetManager.update();
@@ -54,17 +51,6 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-
-	private retrieveFileExplorer(): FileExplorer | null {
-		const fileExplorer =
-			this.app.workspace.getLeavesOfType("file-explorer");
-		if (fileExplorer.length === 0) {
-			console.error("File explorer not found.");
-			return null;
-		}
-
-		return fileExplorer[0].view as FileExplorer;
 	}
 
 	private getVaultBasePath(): string {

@@ -1,25 +1,29 @@
-import { FileExplorer, AFItem, TFolder, FolderItem } from "obsidian";
-import { join } from "path";
+import { FileExplorer, AFItem, TFolder, FolderItem, App } from "obsidian";
 export class FileExplorerHandler {
-	private vaultBasePath: string;
-	private fileExplorer: FileExplorer;
+	public fileExplorer?: FileExplorer;
 
-	constructor(vaultBasePath: string, fileExplorer: FileExplorer) {
-		this.vaultBasePath = vaultBasePath;
-		this.fileExplorer = fileExplorer;
+	constructor(app: App) {
+		this.fileExplorer = FileExplorerHandler.retrieveFileExplorer(app);
 	}
 
 	doWithFolderItem = async (func: (f: FolderItem) => Promise<void>) => {
 		await Promise.all(
-			Object.values(this.fileExplorer.fileItems)
+			Object.values(this.fileExplorer?.fileItems ?? {})
 				.filter(this.isFolder)
 				.map(func)
 		);
 	};
-	getFullPathToItem(item: AFItem): string {
-		return join(this.vaultBasePath, item.file.path);
-	}
 
 	private isFolder = (item: AFItem): item is FolderItem =>
 		(item as FolderItem).file instanceof TFolder;
+
+	static retrieveFileExplorer(app: App): FileExplorer | undefined {
+		const fileExplorer = app.workspace.getLeavesOfType("file-explorer");
+		if (fileExplorer.length === 0) {
+			console.error("File explorer not found.");
+			return undefined;
+		}
+
+		return fileExplorer[0].view as FileExplorer;
+	}
 }

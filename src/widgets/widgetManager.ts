@@ -1,16 +1,18 @@
 import { FileExplorerHandler } from "../fileExplorerHandler";
 import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
-import { App, FolderItem } from "obsidian";
+import { AFItem, App, FolderItem } from "obsidian";
 import { Debouncer } from "./utils/debouncer";
+import { join } from "path";
 
 export class WidgetManager {
 	private widgets: Widget[] = [];
 	private debouncer: Debouncer = new Debouncer(3000);
 
 	constructor(
-		private app: App,
-		private fileExplorerHandler: FileExplorerHandler
+		private factory: GitWidgetFactory,
+		private fileExplorerHandler: FileExplorerHandler,
+		private basePath: string
 	) {
 		this.update = this.update.bind(this);
 	}
@@ -46,15 +48,19 @@ export class WidgetManager {
 		folderItem: FolderItem
 	): Promise<void> {
 		try {
-			const factory = await GitWidgetFactory.getInstance(
-				this.app,
-				folderItem.selfEl,
-				this.fileExplorerHandler.getFullPathToItem(folderItem)
+			const parent = folderItem.selfEl;
+			const absPathToFolder = this.getFullPathToItem(folderItem);
+			const widgets = await this.factory.buildWidgets(
+				parent,
+				absPathToFolder
 			);
-
-			this.widgets.push(...factory.createWidgetsBundle());
+			this.widgets.push(...widgets);
 		} catch (err) {
 			return;
 		}
+	}
+
+	private getFullPathToItem(item: AFItem): string {
+		return join(this.basePath, item.file.path);
 	}
 }
