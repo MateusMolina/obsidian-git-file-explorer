@@ -24,7 +24,7 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 		new Setting(containerEl)
-			.setName("Git changes widget active")
+			.setName("Activate git changes widget")
 			.setHeading()
 			.addToggle((toggle) =>
 				toggle
@@ -36,7 +36,10 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Prompt commit message")
+			.setName("Enable prompting commit message")
+			.setDesc(
+				"Prompt for a commit message when saving a file. If disabled, the commit message is in the format 'Backup @ {iso-timestamp}'"
+			)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.promptCommitMsg)
@@ -58,14 +61,21 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 					})
 			);
 
-		containerEl.createEl("p").innerHTML =
-			"<i>Changes require restarting Obsidian</i>";
+		containerEl
+			.createEl("p")
+			.createEl("i")
+			.setText("Changes require restarting Obsidian");
 
 		this.containerEl.createEl("h2", {
 			text: "About",
 		});
 
-		containerEl.createEl("p").innerHTML =
-			"Made with ☕ by <a href='https://mateusmolina.github.io'>Mateus Molina</a>";
+		const paragraph = containerEl.createEl("p");
+		paragraph.setText("Made with ☕ by ");
+		paragraph
+			.createEl("a", {
+				href: "https://mateusmolina.github.io",
+			})
+			.setText("Mateus Molina");
 	}
 }
