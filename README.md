@@ -2,12 +2,14 @@
 
 This plugin integrates Obsidian's file explorer with Git. Once the plugin is enabled, you will see relevant git information next to git repositories found in your vault in the file explorer.
 
+![Plugin Screencast](assets/obsidian-git-fe-screencast.gif)
+
 ## Features
 
 ### Git Changes Widget
 
 - Number of changed files displayed next to each detected repository in the file explorer
-- Clicking on the component prompts the user for a commit message. After submitting, the component automatically stages and commits all changes in a single commit.
+- Clicking on the component prompts the user for a commit message (adjustable in the configurations). After submitting, the component automatically stages and commits all changes in a single commit.
 
 ### Git Sync Widget
 
