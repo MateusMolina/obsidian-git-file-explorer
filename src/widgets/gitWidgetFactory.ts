@@ -42,7 +42,8 @@ export class GitWidgetFactory {
 			parent,
 			repo,
 			this.app,
-			this.settings.promptCommitMsg
+			this.settings.promptCommitMsg,
+			this.settings.enableNavColorUpdater
 		);
 	}
 

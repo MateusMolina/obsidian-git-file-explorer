@@ -1,15 +1,16 @@
-import { link } from "fs";
 import GitFileExplorerPlugin from "./../main";
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 export interface GitFileExplorerPluginSettings {
-	promptCommitMsg: boolean;
 	gitChangesWidgetActive: boolean;
+	enableNavColorUpdater: boolean;
+	promptCommitMsg: boolean;
 	gitSyncWidgetActive: boolean;
 }
 
 export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	promptCommitMsg: true,
+	enableNavColorUpdater: true,
 	gitChangesWidgetActive: true,
 	gitSyncWidgetActive: true,
 };
@@ -25,6 +26,9 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 		containerEl.empty();
 		new Setting(containerEl)
 			.setName("Activate git changes widget")
+			.setDesc(
+				"Show a widget in the file explorer with a counter of the current staged and unstaged changes"
+			)
 			.setHeading()
 			.addToggle((toggle) =>
 				toggle
@@ -50,7 +54,21 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Git sync widget active")
+			.setName("Change color of changed files in the file explorer")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.enableNavColorUpdater)
+					.onChange(async (value) => {
+						this.plugin.settings.enableNavColorUpdater = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Activate git sync widget")
+			.setDesc(
+				"Show a widget in the file explorer with a button to sync with the remote repository"
+			)
 			.setHeading()
 			.addToggle((toggle) =>
 				toggle
@@ -70,7 +88,7 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 			text: "About",
 		});
 
-		const paragraph = containerEl.createEl("p");
+		const paragraph = containerEl.createEl("small");
 		paragraph.setText("Made with ☕ by ");
 		paragraph
 			.createEl("a", {

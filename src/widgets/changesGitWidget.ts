@@ -12,11 +12,14 @@ export class ChangesGitWidget extends GitWidget {
 		navFolderTitleEl: HTMLElement,
 		gitRepository: GitRepository,
 		private app: App,
-		private promptCommitMsg = false
+		private promptCommitMsg = false,
+		enableNavColorUpdater = true
 	) {
 		super(navFolderTitleEl, gitRepository, "changes-git-widget");
 		this.updateCallbacks.push(this.updateChanges.bind(this));
-		this.navColorUpdater = new NavColorUpdater(navFolderTitleEl);
+
+		if (enableNavColorUpdater)
+			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl);
 	}
 
 	async updateChanges() {
