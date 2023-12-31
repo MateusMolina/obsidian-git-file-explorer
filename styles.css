@@ -11,15 +11,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 2em;
+    width: 2.5em;
     height: 1.5em;
     margin-left: 2em;
 }
 .git-widget:nth-of-type(1) {
-    right: 2.5em;
+    right: 3em;
 }
 .git-widget-changes {
-    background-color: #ff7f50;
+    background-color: #b38522;
     color: #ffffff;
 }
 .git-widget-changes:hover {
@@ -34,7 +34,7 @@
     color: #ffffff;
 }
 .git-widget-sync {
-    background-color: #126a90;
+    background-color: #41697a;
     color: #ffffff;
     width: 5.5em;
 }
@@ -42,5 +42,5 @@
     filter: brightness(120%);
 }
 .git-changed-file {
-    color: #ff7f50 !important;
+    color: #b38522 !important;
 }
