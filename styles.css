@@ -36,8 +36,11 @@
 .git-widget-sync {
     background-color: #126a90;
     color: #ffffff;
-    width: 5em;
+    width: 5.5em;
 }
 .git-widget-sync:hover {
     filter: brightness(120%);
+}
+.git-changed-file {
+    color: #ff7f50 !important;
 }

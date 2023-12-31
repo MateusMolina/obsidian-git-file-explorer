@@ -1,11 +1,11 @@
-import simpleGit, { SimpleGit } from "simple-git";
+import simpleGit, { FileStatusResult, SimpleGit } from "simple-git";
 import { join } from "path";
 import { existsSync } from "fs";
 export class GitRepository {
 	private git: SimpleGit;
 	private remoteBranch: string | undefined = undefined;
 
-	private constructor(private repoAbsPath: string) {
+	private constructor(public repoAbsPath: string) {
 		this.git = simpleGit(this.repoAbsPath);
 	}
 
@@ -30,9 +30,9 @@ export class GitRepository {
 		return existsSync(gitDir);
 	}
 
-	async getChangedFilesCount(): Promise<number> {
+	async getChangedFiles(): Promise<FileStatusResult[]> {
 		const status = await this.git.status();
-		return status.files.length;
+		return status.files;
 	}
 
 	async getToPullCommitsCount(): Promise<number> {

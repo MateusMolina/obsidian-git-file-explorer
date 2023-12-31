@@ -1,13 +1,13 @@
 import { FileExplorerHandler } from "../fileExplorerHandler";
 import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
-import { AFItem, App, FolderItem } from "obsidian";
+import { AFItem, FolderItem } from "obsidian";
 import { Debouncer } from "./utils/debouncer";
 import { join } from "path";
 
 export class WidgetManager {
 	private widgets: Widget[] = [];
-	private debouncer: Debouncer = new Debouncer(3000);
+	private debouncer: Debouncer = new Debouncer(1500);
 
 	constructor(
 		private factory: GitWidgetFactory,
@@ -37,7 +37,7 @@ export class WidgetManager {
 	};
 
 	private addWidgetsForNewFolderItems = async () =>
-		this.fileExplorerHandler.doWithFolderItem(async (folderItem) => {
+		await this.fileExplorerHandler.doWithFolderItem(async (folderItem) => {
 			if (this.isNewFolderItem(folderItem))
 				await this.createWidgetsForFolderItem(folderItem);
 		});

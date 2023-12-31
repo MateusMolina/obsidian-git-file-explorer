@@ -11,6 +11,7 @@ import {
 export default class GitFileExplorerPlugin extends Plugin {
 	settings: GitFileExplorerPluginSettings;
 	widgetManager: WidgetManager;
+	fileExplorerHandler: FileExplorerHandler;
 
 	async onload() {
 		await this.loadSettings();
@@ -19,13 +20,13 @@ export default class GitFileExplorerPlugin extends Plugin {
 	}
 
 	initialize = async () => {
-		const fileExplorerHandler = new FileExplorerHandler(this.app);
+		this.fileExplorerHandler = new FileExplorerHandler(this.app);
 
-		if (!fileExplorerHandler.fileExplorer) return;
+		if (!this.fileExplorerHandler.fileExplorer) return;
 
 		this.widgetManager = new WidgetManager(
 			new GitWidgetFactory(this.app, this.settings),
-			fileExplorerHandler,
+			this.fileExplorerHandler,
 			this.getVaultBasePath()
 		);
 
@@ -37,6 +38,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 	onunload() {
 		console.log("Unloading GitFileExplorerPlugin");
 		this.widgetManager.uninstallAll();
+		this.deregisterEventListeners(this.widgetManager.update);
 	}
 
 	async loadSettings() {
@@ -64,5 +66,16 @@ export default class GitFileExplorerPlugin extends Plugin {
 		this.registerEvent(this.app.vault.on("delete", callback));
 		this.registerEvent(this.app.vault.on("rename", callback));
 		this.registerEvent(this.app.vault.on("modify", callback));
+		this.fileExplorerHandler.fileExplorer?.containerEl.addEventListener(
+			"click",
+			callback
+		);
+	}
+
+	private deregisterEventListeners(callback: () => void) {
+		this.fileExplorerHandler.fileExplorer?.containerEl.removeEventListener(
+			"click",
+			callback
+		);
 	}
 }

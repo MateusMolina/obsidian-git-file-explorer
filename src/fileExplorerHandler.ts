@@ -6,13 +6,12 @@ export class FileExplorerHandler {
 		this.fileExplorer = FileExplorerHandler.retrieveFileExplorer(app);
 	}
 
-	doWithFolderItem = async (func: (f: FolderItem) => Promise<void>) => {
-		await Promise.all(
+	doWithFolderItem = async (func: (f: FolderItem) => void | Promise<void>) =>
+		Promise.all(
 			Object.values(this.fileExplorer?.fileItems ?? {})
 				.filter(this.isFolder)
 				.map(func)
 		);
-	};
 
 	private isFolder = (item: AFItem): item is FolderItem =>
 		(item as FolderItem).file instanceof TFolder;

@@ -1,24 +1,32 @@
 import { App, Modal, Setting } from "obsidian";
 import { GitRepository } from "../git/gitRepository";
 import { GitWidget } from "./gitWidget";
+import { NavColorUpdater } from "./NavColorUpdater";
+export type GitNode = { path: string };
+
 export class ChangesGitWidget extends GitWidget {
 	private changesBuffer = 0;
+	private navColorUpdater: NavColorUpdater | undefined;
 
 	constructor(
-		parent: HTMLElement,
+		navFolderTitleEl: HTMLElement,
 		gitRepository: GitRepository,
 		private app: App,
 		private promptCommitMsg = false
 	) {
-		super(parent, gitRepository, "changes-git-widget");
+		super(navFolderTitleEl, gitRepository, "changes-git-widget");
 		this.updateCallbacks.push(this.updateChanges.bind(this));
+		this.navColorUpdater = new NavColorUpdater(navFolderTitleEl);
 	}
 
 	async updateChanges() {
-		const changesBuffer = await this.gitRepository.getChangedFilesCount();
+		const changedNodes =
+			(await this.gitRepository.getChangedFiles()) as GitNode[];
 
-		if (changesBuffer) {
-			this.changesBuffer = changesBuffer;
+		this.navColorUpdater?.update(changedNodes);
+
+		if (changedNodes.length > 0) {
+			this.changesBuffer = changedNodes.length;
 			this.widgetEl.classList.add("git-widget-changes");
 			this.updateText(this.changesBuffer.toString());
 			this.enableEvents();
