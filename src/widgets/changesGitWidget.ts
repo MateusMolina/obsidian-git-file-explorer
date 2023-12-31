@@ -1,7 +1,7 @@
 import { App, Modal, Setting } from "obsidian";
 import { GitRepository } from "../git/gitRepository";
 import { GitWidget } from "./gitWidget";
-import { NavColorUpdater } from "./NavColorUpdater";
+import { NavColorUpdater } from "./navColorUpdater";
 export type GitNode = { path: string };
 
 export class ChangesGitWidget extends GitWidget {
