@@ -76,9 +76,10 @@ export abstract class GitWidget implements Widget {
 			});
 	}
 
-	protected guardFunction(fun: () => void) {
-		return () => {
-			if (fun && this.eventsEnabled) fun();
+	protected guardFunction(fun: (event?: Event) => void) {
+		return (event?: Event) => {
+			if (event) event.stopPropagation();
+			if (fun && this.eventsEnabled) fun(event);
 		};
 	}
 
