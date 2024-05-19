@@ -25,6 +25,12 @@ export class GitRepository {
 		return gitRepository;
 	}
 
+	static initGitRepo(repoAbsPath: string): GitRepository {
+		const git = simpleGit(repoAbsPath);
+		git.init();
+		return new GitRepository(repoAbsPath);
+	}
+
 	static isGitRepo(fullPath: string): boolean {
 		const gitDir = join(fullPath, ".git");
 		return existsSync(gitDir);

@@ -7,6 +7,7 @@ import {
 	GitFileExplorerPluginSettings,
 	GitFileExplorerSettingTab,
 } from "./src/settings";
+import { InitNewRepoHandler } from "src/initNewRepoHandler";
 
 export default class GitFileExplorerPlugin extends Plugin {
 	settings: GitFileExplorerPluginSettings;
@@ -33,6 +34,8 @@ export default class GitFileExplorerPlugin extends Plugin {
 		await this.widgetManager.update();
 
 		this.registerEventListeners(this.widgetManager.update);
+
+		this.installFileRepositoryContextMenuHandlers();
 	};
 
 	onunload() {
@@ -76,6 +79,16 @@ export default class GitFileExplorerPlugin extends Plugin {
 		this.fileExplorerHandler.fileExplorer?.containerEl.removeEventListener(
 			"click",
 			callback
+		);
+	}
+
+	private installFileRepositoryContextMenuHandlers() {
+		const initNewRepoHandler = new InitNewRepoHandler(
+			this.getVaultBasePath()
+		).withCallback(this.widgetManager.update);
+
+		this.registerEvent(
+			this.app.workspace.on("file-menu", initNewRepoHandler.install)
 		);
 	}
 }
