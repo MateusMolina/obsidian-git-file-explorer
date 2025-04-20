@@ -6,6 +6,7 @@ export interface GitFileExplorerPluginSettings {
 	enableNavColorUpdater: boolean;
 	promptCommitMsg: boolean;
 	gitSyncWidgetActive: boolean;
+	navColorStyle: "colored-text" | "margin-highlight";
 }
 
 export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
@@ -13,6 +14,7 @@ export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	enableNavColorUpdater: true,
 	gitChangesWidgetActive: true,
 	gitSyncWidgetActive: true,
+	navColorStyle: "colored-text",
 };
 
 export class GitFileExplorerSettingTab extends PluginSettingTab {
@@ -60,6 +62,20 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.enableNavColorUpdater)
 					.onChange(async (value) => {
 						this.plugin.settings.enableNavColorUpdater = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Changed files style")
+			.setDesc("Choose how changed files should be highlighted in the file explorer")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption("colored-text", "Colored text")
+					.addOption("margin-highlight", "Margin highlight + colored text")
+					.setValue(this.plugin.settings.navColorStyle)
+					.onChange(async (value: "colored-text" | "margin-highlight") => {
+						this.plugin.settings.navColorStyle = value;
 						await this.plugin.saveSettings();
 					})
 			);

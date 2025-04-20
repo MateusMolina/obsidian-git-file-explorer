@@ -20,13 +20,14 @@ export class ChangesGitWidget extends GitWidget {
 		gitRepository: GitRepository,
 		private app: App,
 		private promptCommitMsg = false,
-		enableNavColorUpdater = true
+		enableNavColorUpdater = true,
+		private navColorStyle: "colored-text" | "margin-highlight" = "colored-text"
 	) {
 		super(navFolderTitleEl, gitRepository, "changes-git-widget");
 		this.updateCallbacks.push(this.updateChanges.bind(this));
 
 		if (enableNavColorUpdater)
-			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl);
+			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl, navColorStyle);
 	}
 
 	async updateChanges() {
