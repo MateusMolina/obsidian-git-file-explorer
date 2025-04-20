@@ -108,7 +108,7 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 		paragraph.setText("Made with ☕ by ");
 		paragraph
 			.createEl("a", {
-				href: "https://mateusmolina.github.io",
+				href: "https://blog.mmolina.me",
 			})
 			.setText("Mateus Molina");
 	}
