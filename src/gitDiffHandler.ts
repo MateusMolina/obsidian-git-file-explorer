@@ -24,7 +24,9 @@ export class GitDiffHandler {
 		if (!repoRoot) return; 
 		
 		menu.addItem((item: MenuItem) => {
-			item.setTitle(GitDiffHandler.OPEN_GIT_DIFF).onClick(async () => {
+			item.setTitle(GitDiffHandler.OPEN_GIT_DIFF)
+				.setIcon("git-pull-request") 
+				.onClick(async () => {
 				try {
 					const normalizedRepoRoot = repoRoot;
 					const normalizedTargetPath = this.buildAbsPathTo(fileOrFolder.path);
