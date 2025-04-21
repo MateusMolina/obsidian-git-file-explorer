@@ -30,10 +30,7 @@ export class WidgetManager {
 	}
 
 	private updateExistingWidgets = async () => {
-		for (const widget of this.widgets) {
-			await widget.update();
-			await new Promise((resolve) => setTimeout(resolve, 100));
-		}
+		await Promise.all(this.widgets.map((widget) => widget.update()));
 	};
 
 	private addWidgetsForNewFolderItems = async () =>

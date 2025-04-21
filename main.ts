@@ -8,6 +8,10 @@ import {
 	GitFileExplorerSettingTab,
 } from "./src/settings";
 import { InitNewRepoHandler } from "src/initNewRepoHandler";
+import { GitDiffHandler } from "src/gitDiffHandler";
+import { ContextMenuInstaller } from "src/contextMenuInstaller";
+import { CommandRegister } from "src/commandRegister";
+import { CapabilityProvider } from "src/capabilityProvider";
 
 export default class GitFileExplorerPlugin extends Plugin {
 	settings: GitFileExplorerPluginSettings;
@@ -35,7 +39,21 @@ export default class GitFileExplorerPlugin extends Plugin {
 
 		this.registerEventListeners(this.widgetManager.update);
 
-		this.installFileRepositoryContextMenuHandlers();
+		const capabilityProviders: CapabilityProvider[] = [
+			new GitDiffHandler(this.getVaultBasePath())
+				.withCallback(() => this.widgetManager?.update()),
+			new InitNewRepoHandler(this.getVaultBasePath())
+				.withCallback(() => this.widgetManager?.update())
+		];
+
+		const contextMenuInstaller = new ContextMenuInstaller(this);
+		
+		const commandRegister = new CommandRegister(this);
+		
+		capabilityProviders.forEach(provider => {
+			contextMenuInstaller.installContextMenu(provider);
+			commandRegister.registerCommandForActiveFile(provider);
+		});
 	};
 
 	onunload() {
@@ -79,16 +97,6 @@ export default class GitFileExplorerPlugin extends Plugin {
 		this.fileExplorerHandler.fileExplorer?.containerEl.removeEventListener(
 			"click",
 			callback
-		);
-	}
-
-	private installFileRepositoryContextMenuHandlers() {
-		const initNewRepoHandler = new InitNewRepoHandler(
-			this.getVaultBasePath()
-		).withCallback(this.widgetManager.update);
-
-		this.registerEvent(
-			this.app.workspace.on("file-menu", initNewRepoHandler.install)
 		);
 	}
 }
