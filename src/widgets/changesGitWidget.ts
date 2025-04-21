@@ -6,25 +6,37 @@ export type GitNode = { path: string };
 
 export class ChangesGitWidget extends GitWidget {
 	private changesBuffer = 0;
+	private lastChangedPaths = new Set<string>();
 	private navColorUpdater: NavColorUpdater | undefined;
+
+	private setsEqual(a: Set<string>, b: Set<string>): boolean {
+		if (a.size !== b.size) return false;
+		for (const x of a) if (!b.has(x)) return false;
+		return true;
+	}
 
 	constructor(
 		navFolderTitleEl: HTMLElement,
 		gitRepository: GitRepository,
 		private app: App,
 		private promptCommitMsg = false,
-		enableNavColorUpdater = true
+		enableNavColorUpdater = true,
+		private navColorStyle: "colored-text" | "margin-highlight" = "colored-text"
 	) {
 		super(navFolderTitleEl, gitRepository, "changes-git-widget");
 		this.updateCallbacks.push(this.updateChanges.bind(this));
 
 		if (enableNavColorUpdater)
-			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl);
+			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl, navColorStyle);
 	}
 
 	async updateChanges() {
 		const changedNodes =
 			(await this.gitRepository.getChangedFiles()) as GitNode[];
+		const newPaths = new Set(changedNodes.map(n => n.path));
+		
+		if (this.setsEqual(newPaths, this.lastChangedPaths)) return;
+		this.lastChangedPaths = newPaths;
 
 		this.navColorUpdater?.update(changedNodes);
 
@@ -64,6 +76,11 @@ export class ChangesGitWidget extends GitWidget {
 
 	protected onMouseOut() {
 		this.updateText(this.changesBuffer.toString());
+	}
+
+	uninstall() {
+		super.uninstall();
+		this.navColorUpdater?.cleanup();
 	}
 }
 
