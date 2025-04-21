@@ -8,6 +8,7 @@ import {
 	GitFileExplorerSettingTab,
 } from "./src/settings";
 import { InitNewRepoHandler } from "src/initNewRepoHandler";
+import { GitDiffHandler } from "src/gitDiffHandler";
 
 export default class GitFileExplorerPlugin extends Plugin {
 	settings: GitFileExplorerPluginSettings;
@@ -87,8 +88,16 @@ export default class GitFileExplorerPlugin extends Plugin {
 			this.getVaultBasePath()
 		).withCallback(this.widgetManager.update);
 
+		const gitDiffHandler = new GitDiffHandler(
+			this.getVaultBasePath()
+		).withCallback(this.widgetManager.update);
+
 		this.registerEvent(
 			this.app.workspace.on("file-menu", initNewRepoHandler.install)
+		);
+		
+		this.registerEvent(
+			this.app.workspace.on("file-menu", gitDiffHandler.install)
 		);
 	}
 }
