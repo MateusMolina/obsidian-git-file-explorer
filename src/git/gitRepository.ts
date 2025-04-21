@@ -1,6 +1,8 @@
 import simpleGit, { FileStatusResult, SimpleGit } from "simple-git";
 import { join } from "path";
 import { existsSync } from "fs";
+import { TerminalExecutor } from "./utils/terminalExecutor";
+
 export class GitRepository {
 	private git: SimpleGit;
 	private remoteBranch: string | undefined = undefined;
@@ -110,5 +112,25 @@ export class GitRepository {
 		if (!commitMsg) commitMsg = "Backup @ " + new Date().toISOString();
 		await this.stageAll();
 		await this.commit(commitMsg);
+	}
+
+	static async openDiff(repoAbsPath: string, relativePath: string = ""): Promise<void> {
+		if (!GitRepository.isGitRepo(repoAbsPath)) 
+			throw new Error("Not a git repository @ " + repoAbsPath);
+
+		try {
+			const gitCmd = relativePath 
+				? `git difftool --no-prompt -- "${relativePath}"`
+				: 'git difftool --no-prompt';
+			
+			console.log(`Opening git diff tool for repository: ${repoAbsPath}`);
+			
+			await TerminalExecutor.execute(repoAbsPath, gitCmd);
+			
+			return Promise.resolve();
+		} catch (error) {
+			console.error('Error launching git difftool:', error);
+			return Promise.reject(error);
+		}
 	}
 }
