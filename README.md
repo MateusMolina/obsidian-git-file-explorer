@@ -19,6 +19,13 @@ This plugin integrates Obsidian's file explorer with Git. Once the plugin is ena
 - Upon clicking, a sync process is started: pull (--no-rebase) followed by push to remote
 - Provides visual feedback of the sync status directly in the file explorer
 
+### Git Diff Tool Integration
+
+- Right-click context menu option to open the git diff tool for files and folders
+- Easily visualize changes to files directly from the file explorer
+- Works with any file or folder within a git repository
+- Compatible with your system's default git diff tool
+
 ### File Explorer Enhancements
 
 - Changed files can be highlighted in the file explorer with customizable styling
