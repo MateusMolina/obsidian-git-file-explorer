@@ -1,8 +1,7 @@
 import simpleGit, { FileStatusResult, SimpleGit } from "simple-git";
 import { join } from "path";
 import { existsSync } from "fs";
-import { exec } from "child_process";
-import * as os from "os";
+import { TerminalExecutor } from "./utils/terminalExecutor";
 
 export class GitRepository {
 	private git: SimpleGit;
@@ -115,89 +114,23 @@ export class GitRepository {
 		await this.commit(commitMsg);
 	}
 
-	/**
-	 * Opens the git diff tool for the specified path
-	 * @param repoAbsPath Absolute path to the git repository
-	 * @param relativePath The path relative to the repository root
-	 * @returns A promise that resolves when the diff tool has been launched
-	 */
 	static async openDiff(repoAbsPath: string, relativePath: string = ""): Promise<void> {
-		if (!GitRepository.isGitRepo(repoAbsPath)) {
+		if (!GitRepository.isGitRepo(repoAbsPath)) 
 			throw new Error("Not a git repository @ " + repoAbsPath);
-		}
 
-		return new Promise((resolve, reject) => {
-			try {
-				// Build the git diff command based on platform
-				const platform = os.platform();
-				let command;
-				
-				// Create command based on platform
-				if (platform === 'win32') {
-					// For Windows, use the start command to launch the external program
-					const gitCmd = relativePath 
-						? `git difftool --no-prompt -- "${relativePath}"`
-						: 'git difftool --no-prompt';
-					command = `start "" /B cmd /C "cd /d "${repoAbsPath}" && ${gitCmd}"`;
-				} else if (platform === 'darwin') {
-					// For macOS
-					const gitCmd = relativePath 
-						? `git difftool --no-prompt -- "${relativePath}"`
-						: 'git difftool --no-prompt';
-					command = `cd "${repoAbsPath}" && ${gitCmd}`;
-				} else {
-					// For Linux - try to detect and use appropriate terminal
-					const gitCmd = relativePath 
-						? `git difftool --no-prompt -- "${relativePath}"`
-						: 'git difftool --no-prompt';
-					
-					// Check for common Linux terminals
-					const terminals = [
-						{ cmd: "gnome-terminal", args: `-- bash -c "cd '${repoAbsPath}' && ${gitCmd}; echo 'Press Enter to close'; read"` },
-						{ cmd: "xterm", args: `-e "cd '${repoAbsPath}' && ${gitCmd}"` },
-						{ cmd: "konsole", args: `--noclose -e bash -c "cd '${repoAbsPath}' && ${gitCmd}; echo 'Press Enter to close'; read"` },
-						{ cmd: "xfce4-terminal", args: `--hold -e "cd '${repoAbsPath}' && ${gitCmd}"` },
-					];
-					
-					// Try to find an available terminal
-					let terminalCommand = '';
-					for (const term of terminals) {
-						try {
-							// Check if the terminal is available
-							const checkResult = exec(`which ${term.cmd}`, { encoding: 'utf8' });
-							if (checkResult) {
-								terminalCommand = `${term.cmd} ${term.args}`;
-								break;
-							}
-						} catch {
-							// Terminal not found, try next one
-						}
-					}
-					
-					// If no terminal found, fall back to basic command
-					command = terminalCommand || `cd "${repoAbsPath}" && ${gitCmd}`;
-					
-					// Attempt to run in background
-					if (command && !command.endsWith('&')) {
-						command += ' &';
-					}
-				}
-				
-				console.log(`Executing command: ${command}`);
-				
-				// Execute the command
-				exec(command, (error) => {
-					if (error) {
-						console.error('Failed to open git difftool:', error);
-						reject(error);
-					} else {
-						resolve();
-					}
-				});
-			} catch (error) {
-				console.error('Error launching git difftool:', error);
-				reject(error);
-			}
-		});
+		try {
+			const gitCmd = relativePath 
+				? `git difftool --no-prompt -- "${relativePath}"`
+				: 'git difftool --no-prompt';
+			
+			console.log(`Opening git diff tool for repository: ${repoAbsPath}`);
+			
+			await TerminalExecutor.execute(repoAbsPath, gitCmd);
+			
+			return Promise.resolve();
+		} catch (error) {
+			console.error('Error launching git difftool:', error);
+			return Promise.reject(error);
+		}
 	}
 }
