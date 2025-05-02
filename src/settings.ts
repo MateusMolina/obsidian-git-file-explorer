@@ -30,6 +30,9 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
+		
+		let gitChangesSettingsContainer: HTMLElement;
+
 		new Setting(containerEl)
 			.setName("Activate git changes widget")
 			.setDesc(
@@ -42,47 +45,14 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.gitChangesWidgetActive = value;
 						await this.plugin.saveSettings();
+						
+						this.renderGitChangesSettings(gitChangesSettingsContainer, value);
 					})
 			);
 
-		new Setting(containerEl)
-			.setName("Enable prompting commit message")
-			.setDesc(
-				"Prompt for a commit message when saving a file. If disabled, the commit message is in the format 'Backup @ {iso-timestamp}'"
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.promptCommitMsg)
-					.onChange(async (value) => {
-						this.plugin.settings.promptCommitMsg = value;
-						await this.plugin.saveSettings();
-					})
-			);
+		gitChangesSettingsContainer = containerEl.createDiv();
 
-		new Setting(containerEl)
-			.setName("Change color of changed files in the file explorer")
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.enableNavColorUpdater)
-					.onChange(async (value) => {
-						this.plugin.settings.enableNavColorUpdater = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Changed files style")
-			.setDesc("Choose how changed files should be highlighted in the file explorer")
-			.addDropdown((dropdown) =>
-				dropdown
-					.addOption("colored-text", "Colored text")
-					.addOption("margin-highlight", "Margin highlight + colored text")
-					.setValue(this.plugin.settings.navColorStyle)
-					.onChange(async (value: "colored-text" | "margin-highlight") => {
-						this.plugin.settings.navColorStyle = value;
-						await this.plugin.saveSettings();
-						})
-			);
+		this.renderGitChangesSettings(gitChangesSettingsContainer, this.plugin.settings.gitChangesWidgetActive);
 
 		let autoSyncSettingsContainer: HTMLElement;
 
@@ -100,7 +70,7 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						
 						this.renderAutoSyncSettings(autoSyncSettingsContainer, value);
-						})
+					})
 			);
 
 		autoSyncSettingsContainer = containerEl.createDiv();
@@ -123,6 +93,51 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 				href: "https://blog.mmolina.me",
 			})
 			.setText("Mateus Molina");
+	}
+
+	private renderGitChangesSettings(container: HTMLElement, isVisible: boolean): void {
+		container.empty();
+		
+		if (isVisible) {
+			new Setting(container)
+				.setName("Enable prompting commit message")
+				.setDesc(
+					"Prompt for a commit message when saving a file. If disabled, the commit message is in the format 'Backup @ {iso-timestamp}'"
+				)
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.promptCommitMsg)
+						.onChange(async (value) => {
+							this.plugin.settings.promptCommitMsg = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(container)
+				.setName("Change color of changed files in the file explorer")
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.enableNavColorUpdater)
+						.onChange(async (value) => {
+							this.plugin.settings.enableNavColorUpdater = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(container)
+				.setName("Changed files style")
+				.setDesc("Choose how changed files should be highlighted in the file explorer")
+				.addDropdown((dropdown) =>
+					dropdown
+						.addOption("colored-text", "Colored text")
+						.addOption("margin-highlight", "Margin highlight + colored text")
+						.setValue(this.plugin.settings.navColorStyle)
+						.onChange(async (value: "colored-text" | "margin-highlight") => {
+							this.plugin.settings.navColorStyle = value;
+							await this.plugin.saveSettings();
+						})
+				);
+		}
 	}
 
 	private renderAutoSyncSettings(container: HTMLElement, isVisible: boolean): void {
