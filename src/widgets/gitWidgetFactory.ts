@@ -55,7 +55,6 @@ export class GitWidgetFactory {
 		return new SyncGitWidget(
 			parent, 
 			repo, 
-			this.settings.autoSyncEnabled,
 			this.settings.autoSyncFrequency,
 			this.settings.autoSyncOnStartup
 		);
