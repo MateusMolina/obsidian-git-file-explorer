@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	gitChangesWidgetActive: true,
 	gitSyncWidgetActive: true,
 	navColorStyle: "colored-text",
-	autoSyncOnStartup: true,
+	autoSyncOnStartup: false,
 	autoSyncFrequency: 0,
 };
 
@@ -150,7 +150,7 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 				)
 				.addSlider((slider) =>
 					slider
-						.setLimits(0, 120, 1)
+						.setLimits(0, 240, 5)
 						.setValue(this.plugin.settings.autoSyncFrequency)
 						.setDynamicTooltip()
 						.onChange(async (value) => {
