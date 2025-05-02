@@ -1,6 +1,6 @@
 import { GitRepository } from "../git/gitRepository";
 import { GitWidget } from "./gitWidget";
-import { AutoSyncManager } from "../git/utils/autoSyncManager";
+import { AutoSyncManager } from "./utils/autoSyncManager";
 
 export class SyncGitWidget extends GitWidget {
 	private autoSyncManager: AutoSyncManager | null = null;

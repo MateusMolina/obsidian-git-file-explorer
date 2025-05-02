@@ -14,20 +14,18 @@ export class AutoSyncManager {
         if (syncOnStartup) 
             this.executeSyncCallback();
 
-        this.scheduleNextSync();
+        if(syncFrequency > 0) 
+            this.scheduleNextSync();
     }
 
     private scheduleNextSync(): void {
-        if (!this.syncCallback) return;
-        
-        this.executeSyncCallback().finally(() => {
-            if (this.isAutoSyncActive() && this.syncFrequency > 0) {
-                this.syncTimeoutId = setTimeout(
-                    () => this.scheduleNextSync(), 
-                    this.syncFrequency * 60 * 1000
-                );
-            }
-        });
+        this.syncTimeoutId = setTimeout(
+            async () => {
+                await this.executeSyncCallback();
+                this.scheduleNextSync();
+            }, 
+            this.syncFrequency * 60 * 1000
+        );
     }
 
     stopAutoSync(): void {
@@ -36,10 +34,6 @@ export class AutoSyncManager {
          
         clearTimeout(this.syncTimeoutId);
         this.syncTimeoutId = null;
-    }
-
-    isAutoSyncActive(): boolean {
-        return this.syncTimeoutId !== null;
     }
 
     private async executeSyncCallback(): Promise<void> {
