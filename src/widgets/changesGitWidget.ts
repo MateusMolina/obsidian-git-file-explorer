@@ -25,6 +25,8 @@ export class ChangesGitWidget extends GitWidget {
 	) {
 		super(navFolderTitleEl, gitRepository, "changes-git-widget");
 		this.updateCallbacks.push(this.updateChanges.bind(this));
+		
+		this.updateText("git");
 
 		if (enableNavColorUpdater)
 			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl, navColorStyle);
