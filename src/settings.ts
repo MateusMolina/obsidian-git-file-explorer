@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	gitSyncWidgetActive: true,
 	navColorStyle: "colored-text",
 	autoSyncOnStartup: true,
-	autoSyncFrequency: 30,
+	autoSyncFrequency: 0,
 };
 
 export class GitFileExplorerSettingTab extends PluginSettingTab {
