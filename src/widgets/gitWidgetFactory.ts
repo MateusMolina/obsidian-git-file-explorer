@@ -52,6 +52,11 @@ export class GitWidgetFactory {
 		parent: HTMLElement,
 		repo: GitRepository
 	): SyncGitWidget {
-		return new SyncGitWidget(parent, repo);
+		return new SyncGitWidget(
+			parent, 
+			repo, 
+			this.settings.autoSyncFrequency,
+			this.settings.autoSyncOnStartup
+		);
 	}
 }

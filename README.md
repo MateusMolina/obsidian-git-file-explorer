@@ -18,6 +18,10 @@ This plugin integrates Obsidian's file explorer with Git. Once the plugin is ena
 - Shows the number of commits to be pulled and pushed from the remote
 - Upon clicking, a sync process is started: pull (--no-rebase) followed by push to remote
 - Provides visual feedback of the sync status directly in the file explorer
+- **Auto-sync feature**: Automatically synchronize repositories on a schedule
+  - Configure auto-sync on startup to sync repositories when Obsidian starts
+  - Set custom auto-sync frequency (in minutes) for periodic background synchronization
+  - Visual indicator shows when auto-sync is active for a repository
 
 ### Git Diff Tool Integration
 

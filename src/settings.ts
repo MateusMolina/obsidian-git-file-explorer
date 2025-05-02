@@ -7,6 +7,8 @@ export interface GitFileExplorerPluginSettings {
 	promptCommitMsg: boolean;
 	gitSyncWidgetActive: boolean;
 	navColorStyle: "colored-text" | "margin-highlight";
+	autoSyncOnStartup: boolean;
+	autoSyncFrequency: number;
 }
 
 export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
@@ -15,6 +17,8 @@ export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	gitChangesWidgetActive: true,
 	gitSyncWidgetActive: true,
 	navColorStyle: "colored-text",
+	autoSyncOnStartup: false,
+	autoSyncFrequency: 0,
 };
 
 export class GitFileExplorerSettingTab extends PluginSettingTab {
@@ -77,8 +81,10 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 					.onChange(async (value: "colored-text" | "margin-highlight") => {
 						this.plugin.settings.navColorStyle = value;
 						await this.plugin.saveSettings();
-					})
+						})
 			);
+
+		let autoSyncSettingsContainer: HTMLElement;
 
 		new Setting(containerEl)
 			.setName("Activate git sync widget")
@@ -92,8 +98,14 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.gitSyncWidgetActive = value;
 						await this.plugin.saveSettings();
-					})
+						
+						this.renderAutoSyncSettings(autoSyncSettingsContainer, value);
+						})
 			);
+
+		autoSyncSettingsContainer = containerEl.createDiv();
+
+		this.renderAutoSyncSettings(autoSyncSettingsContainer, this.plugin.settings.gitSyncWidgetActive);
 
 		containerEl
 			.createEl("p")
@@ -111,5 +123,41 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 				href: "https://blog.mmolina.me",
 			})
 			.setText("Mateus Molina");
+	}
+
+	private renderAutoSyncSettings(container: HTMLElement, isVisible: boolean): void {
+		container.empty();
+		
+		if (isVisible) {
+			new Setting(container)
+				.setName("Auto-sync on startup")
+				.setDesc(
+					"Automatically sync repositories when Obsidian starts"
+				)
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.autoSyncOnStartup)
+						.onChange(async (value) => {
+							this.plugin.settings.autoSyncOnStartup = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(container)
+				.setName("Auto-sync frequency (minutes)")
+				.setDesc(
+					"How often to automatically sync repositories (0 to disable periodic sync)"
+				)
+				.addSlider((slider) =>
+					slider
+						.setLimits(0, 240, 5)
+						.setValue(this.plugin.settings.autoSyncFrequency)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							this.plugin.settings.autoSyncFrequency = value;
+							await this.plugin.saveSettings();
+						})
+				);
+		}
 	}
 }
