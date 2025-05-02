@@ -2,12 +2,14 @@ import { FileExplorerHandler } from "../fileExplorerHandler";
 import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
 import { AFItem, FolderItem } from "obsidian";
-import { Debouncer } from "./utils/debouncer";
 import { join } from "path";
+import { SmartDebouncer } from "./utils/smartDebouncer";
+import { GitEventBus } from "./utils/eventBus";
 
 export class WidgetManager {
 	private widgets: Widget[] = [];
-	private debouncer: Debouncer = new Debouncer(1500);
+	private smartDebouncer: SmartDebouncer = new SmartDebouncer(1500);
+	private eventBus: GitEventBus = GitEventBus.getInstance();
 
 	constructor(
 		private factory: GitWidgetFactory,
@@ -18,15 +20,19 @@ export class WidgetManager {
 	}
 
 	public async update(): Promise<void> {
-		this.debouncer.debounceAndRunWhenIdle(this.updateNow.bind(this));
+		this.smartDebouncer.debounce("*", async () => {
+			await this.addWidgetsForNewFolderItems();
+			await this.updateExistingWidgets();
+		});
 	}
 
-	public uninstallAll = () =>
+	public uninstallAll = () => {
+		this.eventBus.clearListeners();
+		
+		this.smartDebouncer.clearAll();
+		
 		this.widgets.forEach((widget) => widget.uninstall());
-
-	private async updateNow() {
-		await this.addWidgetsForNewFolderItems();
-		await this.updateExistingWidgets();
+		this.widgets = [];
 	}
 
 	private updateExistingWidgets = async () => {
@@ -37,7 +43,7 @@ export class WidgetManager {
 		await this.fileExplorerHandler.doWithFolderItem(async (folderItem) => {
 			if (this.isNewFolderItem(folderItem))
 				await this.createWidgetsForFolderItem(folderItem);
-		});
+			});
 
 	private isNewFolderItem = (folderItem: FolderItem) =>
 		!this.widgets.some((widget) =>
@@ -54,7 +60,18 @@ export class WidgetManager {
 				parent,
 				absPathToFolder
 			);
-			this.widgets.push(...widgets);
+			
+			if (widgets.length > 0) {
+				this.widgets.push(...widgets);
+				
+				widgets.forEach(widget => {
+					this.eventBus.subscribe(absPathToFolder, (updatedRepoPath) => {
+						this.smartDebouncer.debounce(updatedRepoPath, async () => {
+							await widget.update();
+						});
+					});
+				});
+			}
 		} catch (err) {
 			return;
 		}

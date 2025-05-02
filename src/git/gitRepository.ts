@@ -2,13 +2,20 @@ import simpleGit, { FileStatusResult, SimpleGit } from "simple-git";
 import { join } from "path";
 import { existsSync } from "fs";
 import { TerminalExecutor } from "./utils/terminalExecutor";
+import { GitEventBus } from "../widgets/utils/eventBus";
 
 export class GitRepository {
 	private git: SimpleGit;
 	private remoteBranch: string | undefined = undefined;
+	private eventBus: GitEventBus;
 
 	private constructor(public repoAbsPath: string) {
 		this.git = simpleGit(this.repoAbsPath);
+		this.eventBus = GitEventBus.getInstance();
+	}
+
+	private notifyUpdate(): void {
+		this.eventBus.notifyUpdate(this.repoAbsPath);
 	}
 
 	async setup() {
@@ -68,14 +75,17 @@ export class GitRepository {
 
 	async stageAll(): Promise<void> {
 		await this.git.add("./*");
+		this.notifyUpdate();
 	}
 
 	async commit(message: string): Promise<void> {
 		await this.git.commit(message);
+		this.notifyUpdate();
 	}
 
 	async fetchOrigin(): Promise<void> {
 		await this.git.fetch();
+		this.notifyUpdate();
 	}
 
 	async hasRemote(): Promise<boolean> {
@@ -92,6 +102,7 @@ export class GitRepository {
 		if (!this.remoteBranch) return Promise.reject("No remote branch");
 
 		await this.git.push("origin", this.remoteBranch);
+		this.notifyUpdate();
 	}
 
 	async pullToOrigin(): Promise<void> {
@@ -101,6 +112,7 @@ export class GitRepository {
 			"--no-edit",
 			"--no-rebase",
 		]);
+		this.notifyUpdate();
 	}
 
 	async sync(): Promise<void> {
