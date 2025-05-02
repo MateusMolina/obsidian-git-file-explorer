@@ -41,3 +41,21 @@
 .git-widget-sync:hover {
     filter: brightness(120%);
 }
+
+.git-widget-sync.auto-sync-active::before {
+    content: "•";
+    right: 2px;
+    position: relative;
+    top: -1.5px;
+    color: #fe5050;
+    font-size: 2em;
+    animation: subtle-pulse 6s infinite;
+    text-shadow: 0 0 3px rgba(255, 0, 0);
+}
+
+@keyframes subtle-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 1; }
+    75% { opacity: 0.7; }
+    100% { opacity: 1; }
+}

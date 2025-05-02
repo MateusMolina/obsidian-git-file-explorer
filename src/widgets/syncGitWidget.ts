@@ -1,9 +1,31 @@
 import { GitRepository } from "../git/gitRepository";
 import { GitWidget } from "./gitWidget";
+import { AutoSyncManager } from "../git/utils/autoSyncManager";
+
 export class SyncGitWidget extends GitWidget {
-	constructor(parent: HTMLElement, gitRepository: GitRepository) {
+	private autoSyncManager: AutoSyncManager | null = null;
+
+	constructor(
+		parent: HTMLElement, 
+		gitRepository: GitRepository, 
+		autoSyncEnabled: boolean,
+		autoSyncFrequency: number,
+		autoSyncOnStartup: boolean
+	) {
 		super(parent, gitRepository, "sync-git-widget");
 		this.updateCallbacks.push(this.updateSyncStatus.bind(this));
+		
+		if (!autoSyncEnabled) 
+			return;
+
+		this.autoSyncManager = new AutoSyncManager(
+			autoSyncFrequency,
+			autoSyncOnStartup,
+			this.onClick.bind(this)
+		);
+		
+		this.widgetEl.classList.add("auto-sync-active");
+		
 	}
 
 	async updateSyncStatus() {
@@ -26,6 +48,13 @@ export class SyncGitWidget extends GitWidget {
 		await this.executeWithSuccessAnimation(
 			this.gitRepository.sync.bind(this.gitRepository)
 		).finally(this.update);
+	}
+
+	uninstall() {
+		if (this.autoSyncManager) 
+			this.autoSyncManager.stopAutoSync();
+		
+		super.uninstall();
 	}
 
 	protected onMouseOver() {}

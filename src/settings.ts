@@ -7,6 +7,9 @@ export interface GitFileExplorerPluginSettings {
 	promptCommitMsg: boolean;
 	gitSyncWidgetActive: boolean;
 	navColorStyle: "colored-text" | "margin-highlight";
+	autoSyncEnabled: boolean;
+	autoSyncOnStartup: boolean;
+	autoSyncFrequency: number;
 }
 
 export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
@@ -15,6 +18,9 @@ export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	gitChangesWidgetActive: true,
 	gitSyncWidgetActive: true,
 	navColorStyle: "colored-text",
+	autoSyncEnabled: false,
+	autoSyncOnStartup: true,
+	autoSyncFrequency: 30,
 };
 
 export class GitFileExplorerSettingTab extends PluginSettingTab {
@@ -91,6 +97,50 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.gitSyncWidgetActive)
 					.onChange(async (value) => {
 						this.plugin.settings.gitSyncWidgetActive = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Enable auto-sync")
+			.setDesc(
+				"Enable automatic syncing with remote repositories"
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.autoSyncEnabled)
+					.onChange(async (value) => {
+						this.plugin.settings.autoSyncEnabled = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Auto-sync on startup")
+			.setDesc(
+				"Automatically sync repositories when Obsidian starts"
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.autoSyncOnStartup)
+					.onChange(async (value) => {
+						this.plugin.settings.autoSyncOnStartup = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Auto-sync frequency (minutes)")
+			.setDesc(
+				"How often to automatically sync repositories (0 to disable periodic sync)"
+			)
+			.addSlider((slider) =>
+				slider
+					.setLimits(0, 120, 5)
+					.setValue(this.plugin.settings.autoSyncFrequency)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						this.plugin.settings.autoSyncFrequency = value;
 						await this.plugin.saveSettings();
 					})
 			);
