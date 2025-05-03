@@ -18,23 +18,12 @@ export class GitEventBus {
    * @param callback Callback function that receives the repository path
    * @returns Unsubscribe function
    */
-  public subscribe(repoPath: string, callback: (repoPath: string) => void): () => void {
+  public subscribe(repoPath: string, callback: (repoPath: string) => void): void {
     if (!this.listeners.has(repoPath)) {
       this.listeners.set(repoPath, []);
     }
     
     this.listeners.get(repoPath)!.push(callback);
-    
-    // Return unsubscribe function
-    return () => {
-      const callbacks = this.listeners.get(repoPath);
-      if (callbacks) {
-        const index = callbacks.indexOf(callback);
-        if (index !== -1) {
-          callbacks.splice(index, 1);
-        }
-      }
-    };
   }
 
   /**
