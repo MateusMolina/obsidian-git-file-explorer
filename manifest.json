@@ -1,7 +1,7 @@
 {
 	"id": "git-file-explorer",
 	"name": "Git File Explorer",
-	"version": "0.7.0",
+	"version": "0.7.1",
 	"minAppVersion": "0.15.0",
 	"description": "Add relevant git information to detected git repostitories in the file explorer.",
 	"author": "Mateus Molina",
