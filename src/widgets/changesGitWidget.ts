@@ -32,6 +32,8 @@ export class ChangesGitWidget extends GitWidget {
 			this.navColorUpdater = new NavColorUpdater(navFolderTitleEl, navColorStyle);
 	}
 
+	public getName() {return "changes-git-widget"};
+
 	async updateChanges() {
 		const changedNodes =
 			(await this.gitRepository.getChangedFiles()) as GitNode[];

@@ -20,6 +20,8 @@ export abstract class GitWidget implements Widget {
 		this.addEventListeners();
 	}
 
+	abstract getName(): string;
+
 	getParent(): HTMLElement {
 		return this.parent;
 	}

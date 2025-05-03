@@ -25,6 +25,8 @@ export class SyncGitWidget extends GitWidget {
 		}
 	}
 
+	public getName() { return "sync-git-widget"};
+
 	async updateSyncStatus() {
 		try {
 			const toPullCount =

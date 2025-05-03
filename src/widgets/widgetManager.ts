@@ -8,7 +8,7 @@ import { GitEventBus } from "./utils/eventBus";
 
 export class WidgetManager {
 	private widgets: Widget[] = [];
-	private smartDebouncer: SmartDebouncer = new SmartDebouncer(1500);
+	private smartDebouncer: SmartDebouncer = new SmartDebouncer(3000);
 	private eventBus: GitEventBus = GitEventBus.getInstance();
 
 	constructor(
@@ -66,7 +66,7 @@ export class WidgetManager {
 				
 				widgets.forEach(widget => {
 					this.eventBus.subscribe(absPathToFolder, (updatedRepoPath) => {
-						this.smartDebouncer.debounce(updatedRepoPath, async () => {
+						this.smartDebouncer.debounce(updatedRepoPath+"-"+widget.getName(), async () => {
 							await widget.update();
 						});
 					});
