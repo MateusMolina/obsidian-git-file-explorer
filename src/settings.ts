@@ -9,6 +9,9 @@ export interface GitFileExplorerPluginSettings {
 	navColorStyle: "colored-text" | "margin-highlight";
 	autoSyncOnStartup: boolean;
 	autoSyncFrequency: number;
+	syncStartupDelay: number;
+	syncRetryCount: number;
+	syncRetryDelay: number;
 }
 
 export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
@@ -19,6 +22,9 @@ export const DEFAULT_SETTINGS: Partial<GitFileExplorerPluginSettings> = {
 	navColorStyle: "colored-text",
 	autoSyncOnStartup: false,
 	autoSyncFrequency: 0,
+	syncStartupDelay: 0,
+	syncRetryCount: 3,
+	syncRetryDelay: 1,
 };
 
 export class GitFileExplorerSettingTab extends PluginSettingTab {
@@ -159,6 +165,22 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 				);
 
 			new Setting(container)
+				.setName("Startup sync delay (minutes)")
+				.setDesc(
+					"Minutes to wait after Obsidian starts before performing the initial sync (0 for immediate)"
+				)
+				.addSlider((slider) =>
+					slider
+						.setLimits(0, 60, 1)
+						.setValue(this.plugin.settings.syncStartupDelay)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							this.plugin.settings.syncStartupDelay = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(container)
 				.setName("Auto-sync frequency (minutes)")
 				.setDesc(
 					"How often to automatically sync repositories (0 to disable periodic sync)"
@@ -170,6 +192,38 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 						.setDynamicTooltip()
 						.onChange(async (value) => {
 							this.plugin.settings.autoSyncFrequency = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(container)
+				.setName("Sync retry attempts")
+				.setDesc(
+					"Number of times to retry a failed sync before giving up (0 to disable retries)"
+				)
+				.addSlider((slider) =>
+					slider
+						.setLimits(0, 10, 1)
+						.setValue(this.plugin.settings.syncRetryCount)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							this.plugin.settings.syncRetryCount = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(container)
+				.setName("Sync retry delay (minutes)")
+				.setDesc(
+					"Minutes to wait before retrying a failed sync"
+				)
+				.addSlider((slider) =>
+					slider
+						.setLimits(1, 30, 1)
+						.setValue(this.plugin.settings.syncRetryDelay)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							this.plugin.settings.syncRetryDelay = value;
 							await this.plugin.saveSettings();
 						})
 				);

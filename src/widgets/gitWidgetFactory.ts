@@ -56,7 +56,10 @@ export class GitWidgetFactory {
 			parent, 
 			repo, 
 			this.settings.autoSyncFrequency,
-			this.settings.autoSyncOnStartup
+			this.settings.autoSyncOnStartup,
+			this.settings.syncRetryCount,
+			this.settings.syncRetryDelay,
+			this.settings.syncStartupDelay
 		);
 	}
 }
