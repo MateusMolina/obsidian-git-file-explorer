@@ -9,6 +9,7 @@ import {
 } from "./src/settings";
 import { InitNewRepoHandler } from "src/initNewRepoHandler";
 import { GitDiffHandler } from "src/gitDiffHandler";
+import { ViewRemoteHandler } from "src/viewRemoteHandler";
 import { ContextMenuInstaller } from "src/contextMenuInstaller";
 import { CommandRegister } from "src/commandRegister";
 import { CapabilityProvider } from "src/capabilityProvider";
@@ -43,7 +44,8 @@ export default class GitFileExplorerPlugin extends Plugin {
 			new GitDiffHandler(this.getVaultBasePath())
 				.withCallback(() => this.widgetManager?.update()),
 			new InitNewRepoHandler(this.getVaultBasePath())
-				.withCallback(() => this.widgetManager?.update())
+				.withCallback(() => this.widgetManager?.update()),
+			new ViewRemoteHandler(this.getVaultBasePath())
 		];
 
 		const contextMenuInstaller = new ContextMenuInstaller(this);
