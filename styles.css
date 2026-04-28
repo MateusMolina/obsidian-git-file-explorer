@@ -1,3 +1,28 @@
+.nav-header:has(#git-root-widget-container) {
+    position: relative;
+}
+#git-root-widget-container {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+#git-root-widget-container .git-widget {
+    position: static;
+    font-size: 0.65em;
+    height: auto;
+    width: auto;
+    padding: 1px 4px;
+    margin-left: 0;
+    border-radius: 3px;
+    line-height: 1.4;
+}
+#git-root-widget-container .git-widget:nth-of-type(1) {
+    right: auto;
+}
 .git-widget {
     position: absolute;
     right: 0;

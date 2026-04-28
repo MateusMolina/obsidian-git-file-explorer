@@ -25,7 +25,10 @@ export class NavColorUpdater {
 
         const changedPaths = gitNodes.map((node) => {
             const rel = node.path.replace(/\\/g, "/");
-            return path.posix.normalize(`${this.repoRelPath}/${rel}`);
+            const normalized = path.posix.normalize(`${this.repoRelPath}/${rel}`);
+            // Root repos produce "/src/file.ts" — strip leading slash to match Obsidian data-path
+            const dataPath = normalized.startsWith("/") ? normalized.slice(1) : normalized;
+            return dataPath;
         });
         
         const cssRules: string[] = [];

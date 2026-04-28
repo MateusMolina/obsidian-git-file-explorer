@@ -3,6 +3,7 @@ import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
 import { AFItem, FolderItem } from "obsidian";
 import { join } from "path";
+import { existsSync } from "fs";
 import { SmartDebouncer } from "./utils/smartDebouncer";
 import { GitEventBus } from "./utils/eventBus";
 
@@ -21,6 +22,7 @@ export class WidgetManager {
 
 	public async update(): Promise<void> {
 		this.smartDebouncer.debounce("*", async () => {
+			await this.addWidgetsForRoot();
 			await this.addWidgetsForNewFolderItems();
 			await this.updateExistingWidgets();
 		});
@@ -39,10 +41,24 @@ export class WidgetManager {
 		await Promise.all(this.widgets.map((widget) => widget.update()));
 	};
 
+	private addWidgetsForRoot = async () => {
+		if (!existsSync(join(this.basePath, ".git"))) return;
+
+		const rootEl = this.createRootWidgetContainer();
+		if (!rootEl) return;
+
+		const alreadyWidgetized = this.widgets.some((widget) =>
+			widget.getParent().isEqualNode(rootEl)
+		);
+		if (alreadyWidgetized) return;
+
+		await this.registerWidgets(rootEl, this.basePath);
+	};
+
 	private addWidgetsForNewFolderItems = async () =>
 		await this.fileExplorerHandler.doWithFolderItem(async (folderItem) => {
 			if (this.isNewFolderItem(folderItem))
-				await this.createWidgetsForFolderItem(folderItem);
+				await this.registerWidgets(folderItem.selfEl, this.getFullPathToItem(folderItem));
 			});
 
 	private isNewFolderItem = (folderItem: FolderItem) =>
@@ -50,22 +66,15 @@ export class WidgetManager {
 			widget.getParent().isEqualNode(folderItem.selfEl)
 		);
 
-	private async createWidgetsForFolderItem(
-		folderItem: FolderItem
-	): Promise<void> {
+	private async registerWidgets(parent: HTMLElement, absPath: string): Promise<void> {
 		try {
-			const parent = folderItem.selfEl;
-			const absPathToFolder = this.getFullPathToItem(folderItem);
-			const widgets = await this.factory.buildWidgets(
-				parent,
-				absPathToFolder
-			);
-			
+			const widgets = await this.factory.buildWidgets(parent, absPath);
+
 			if (widgets.length > 0) {
 				this.widgets.push(...widgets);
-				
+
 				widgets.forEach(widget => {
-					this.eventBus.subscribe(absPathToFolder, (updatedRepoPath) => {
+					this.eventBus.subscribe(absPath, (updatedRepoPath) => {
 						this.smartDebouncer.debounce(updatedRepoPath+"-"+widget.getName(), async () => {
 							await widget.update();
 						});
@@ -75,6 +84,24 @@ export class WidgetManager {
 		} catch (err) {
 			return;
 		}
+	}
+
+	private createRootWidgetContainer(): HTMLElement | undefined {
+		const containerEl = this.fileExplorerHandler.fileExplorer?.containerEl;
+		if (!containerEl) return undefined;
+
+		const existing = containerEl.querySelector<HTMLElement>('#git-root-widget-container');
+		if (existing) return existing;
+
+		const navHeader = containerEl.querySelector<HTMLElement>('.nav-header');
+		if (!navHeader) return undefined;
+
+		const rootEl = document.createElement('div');
+		rootEl.id = 'git-root-widget-container';
+		rootEl.setAttribute('data-path', '/');
+		navHeader.appendChild(rootEl);
+
+		return rootEl;
 	}
 
 	private getFullPathToItem(item: AFItem): string {
