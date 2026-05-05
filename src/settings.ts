@@ -87,12 +87,12 @@ export class GitFileExplorerSettingTab extends PluginSettingTab {
 		});
 
 		const paragraph = containerEl.createEl("small");
-		paragraph.setText("Made with ☕ by ");
+		paragraph.setText("See list of ");
 		paragraph
 			.createEl("a", {
-				href: "https://blog.mmolina.me",
+				href: "https://github.com/MateusMolina/obsidian-git-file-explorer/graphs/contributors",
 			})
-			.setText("Mateus Molina");
+			.setText("contributors");
 	}
 
 	private renderGitChangesSettings(container: HTMLElement, isVisible: boolean): void {

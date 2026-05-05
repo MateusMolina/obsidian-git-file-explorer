@@ -1,6 +1,6 @@
 # Obsidian Git File Explorer
 
-This plugin integrates Obsidian's file explorer with Git. Once the plugin is enabled, you will see relevant git information next to git repositories found in your vault in the file explorer.
+This plugin brings Git to Obsidian's file explorer. Once enabled, it displays commit status, sync state, and changed files directly next to each repository in your vault.
 
 ![Plugin Screencast](assets/obsidian-git-fe-screencast.gif)
 
@@ -9,14 +9,14 @@ This plugin integrates Obsidian's file explorer with Git. Once the plugin is ena
 ### Git Changes Widget
 
 - Number of changed files displayed next to each detected repository in the file explorer
-- Clicking on the component prompts the user for a commit message (adjustable in the settings)
+- Clicking on the widget prompts the user for a commit message (adjustable in the settings)
 - After submitting, the component automatically stages and commits all changes in a single commit
 - Option to automatically generate commit messages in the format "Backup @ {iso-timestamp}"
 
 ### Git Sync Widget
 
 - Shows the number of commits to be pulled and pushed from the remote
-- Upon clicking, a sync process is started: pull (--no-rebase) followed by push to remote
+- Upon clicking, starts a sync process: pull (--no-rebase) followed by push to remote
 - Provides visual feedback of the sync status directly in the file explorer
 - **Auto-sync feature**: Automatically synchronize repositories on a schedule
   - Configure auto-sync on startup to sync repositories when Obsidian starts
@@ -58,12 +58,7 @@ This plugin integrates Obsidian's file explorer with Git. Once the plugin is ena
 
 Several options are available in the plugin settings:
 
-- Toggle Git Changes Widget
-- Toggle Git Sync Widget
-- Enable/disable commit message prompts
-- Configure visual styling for changed files
-- Choose how changed files are highlighted in the file explorer
-
-## Support
-
-- Made by [Mateus Molina](https://blog.mmolina.me)
+- **Git Changes Widget** — show or hide the commit status widget in the file explorer
+- **Git Sync Widget** — show or hide the pull/push sync widget
+- **Commit message prompts** — prompt for a custom message on each commit, or auto-generate one
+- **Changed file highlighting** — choose between colored text or margin highlight to mark uncommitted files
