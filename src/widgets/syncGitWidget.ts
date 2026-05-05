@@ -9,7 +9,10 @@ export class SyncGitWidget extends GitWidget {
 		parent: HTMLElement, 
 		gitRepository: GitRepository, 
 		autoSyncFrequency: number,
-		autoSyncOnStartup: boolean
+		autoSyncOnStartup: boolean,
+		syncRetryCount: number,
+		syncRetryDelay: number,
+		syncStartupDelay: number
 	) {
 		super(parent, gitRepository, "sync-git-widget");
 		this.updateCallbacks.push(this.updateSyncStatus.bind(this));
@@ -18,7 +21,10 @@ export class SyncGitWidget extends GitWidget {
 			this.autoSyncManager = new AutoSyncManager(
 				autoSyncFrequency,
 				autoSyncOnStartup,
-				this.onClick.bind(this)
+				this.onClick.bind(this),
+				syncRetryCount,
+				syncRetryDelay,
+				syncStartupDelay
 			);
 			
 			this.widgetEl.classList.add("auto-sync-active");
