@@ -3,6 +3,7 @@ import { GitWidgetFactory } from "./gitWidgetFactory";
 import { Widget } from "./widget";
 import { AFItem, FolderItem } from "obsidian";
 import { join } from "path";
+import { existsSync } from "fs";
 import { SmartDebouncer } from "./utils/smartDebouncer";
 import { GitEventBus } from "./utils/eventBus";
 
@@ -18,6 +19,20 @@ export class WidgetManager {
 	) {
 		this.update = this.update.bind(this);
 	}
+
+	public initializeRoot = async () => {
+		if (!existsSync(join(this.basePath, ".git"))) return;
+
+		const rootEl = this.createRootWidgetContainer();
+		if (!rootEl) return;
+
+		const alreadyWidgetized = this.widgets.some((widget) =>
+			widget.getParent().isEqualNode(rootEl)
+		);
+		if (alreadyWidgetized) return;
+
+		await this.registerWidgets(rootEl, this.basePath);
+	};
 
 	public async update(): Promise<void> {
 		this.smartDebouncer.debounce("*", async () => {
@@ -42,7 +57,7 @@ export class WidgetManager {
 	private addWidgetsForNewFolderItems = async () =>
 		await this.fileExplorerHandler.doWithFolderItem(async (folderItem) => {
 			if (this.isNewFolderItem(folderItem))
-				await this.createWidgetsForFolderItem(folderItem);
+				await this.registerWidgets(folderItem.selfEl, this.getFullPathToItem(folderItem));
 			});
 
 	private isNewFolderItem = (folderItem: FolderItem) =>
@@ -50,22 +65,15 @@ export class WidgetManager {
 			widget.getParent().isEqualNode(folderItem.selfEl)
 		);
 
-	private async createWidgetsForFolderItem(
-		folderItem: FolderItem
-	): Promise<void> {
+	private async registerWidgets(parent: HTMLElement, absPath: string): Promise<void> {
 		try {
-			const parent = folderItem.selfEl;
-			const absPathToFolder = this.getFullPathToItem(folderItem);
-			const widgets = await this.factory.buildWidgets(
-				parent,
-				absPathToFolder
-			);
-			
+			const widgets = await this.factory.buildWidgets(parent, absPath);
+
 			if (widgets.length > 0) {
 				this.widgets.push(...widgets);
-				
+
 				widgets.forEach(widget => {
-					this.eventBus.subscribe(absPathToFolder, (updatedRepoPath) => {
+					this.eventBus.subscribe(absPath, (updatedRepoPath) => {
 						this.smartDebouncer.debounce(updatedRepoPath+"-"+widget.getName(), async () => {
 							await widget.update();
 						});
@@ -75,6 +83,23 @@ export class WidgetManager {
 		} catch (err) {
 			return;
 		}
+	}
+
+	private createRootWidgetContainer(): HTMLElement | undefined {
+		const existing = document.querySelector<HTMLElement>('#git-root-widget-container');
+		if (existing) return existing;
+
+		const vaultProfile = document.querySelector<HTMLElement>('.workspace-sidedock-vault-profile');
+		if (!vaultProfile) return undefined;
+
+		const rootEl = document.createElement('div');
+		rootEl.id = 'git-root-widget-container';
+		rootEl.setAttribute('data-path', '/');
+
+		const vaultActions = vaultProfile.querySelector('.workspace-drawer-vault-actions');
+		vaultProfile.insertBefore(rootEl, vaultActions);
+
+		return rootEl;
 	}
 
 	private getFullPathToItem(item: AFItem): string {

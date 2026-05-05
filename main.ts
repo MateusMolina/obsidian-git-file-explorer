@@ -36,6 +36,7 @@ export default class GitFileExplorerPlugin extends Plugin {
 			this.getVaultBasePath()
 		);
 
+		await this.widgetManager.initializeRoot();
 		await this.widgetManager.update();
 
 		this.registerEventListeners(this.widgetManager.update);
@@ -44,7 +45,10 @@ export default class GitFileExplorerPlugin extends Plugin {
 			new GitDiffHandler(this.getVaultBasePath())
 				.withCallback(() => this.widgetManager?.update()),
 			new InitNewRepoHandler(this.getVaultBasePath())
-				.withCallback(() => this.widgetManager?.update()),
+				.withCallback(() => {
+					this.widgetManager?.initializeRoot();
+					this.widgetManager?.update();
+				}),
 			new ViewRemoteHandler(this.getVaultBasePath())
 		];
 
