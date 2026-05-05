@@ -20,9 +20,22 @@ export class WidgetManager {
 		this.update = this.update.bind(this);
 	}
 
+	public initializeRoot = async () => {
+		if (!existsSync(join(this.basePath, ".git"))) return;
+
+		const rootEl = this.createRootWidgetContainer();
+		if (!rootEl) return;
+
+		const alreadyWidgetized = this.widgets.some((widget) =>
+			widget.getParent().isEqualNode(rootEl)
+		);
+		if (alreadyWidgetized) return;
+
+		await this.registerWidgets(rootEl, this.basePath);
+	};
+
 	public async update(): Promise<void> {
 		this.smartDebouncer.debounce("*", async () => {
-			await this.addWidgetsForRoot();
 			await this.addWidgetsForNewFolderItems();
 			await this.updateExistingWidgets();
 		});
@@ -39,20 +52,6 @@ export class WidgetManager {
 
 	private updateExistingWidgets = async () => {
 		await Promise.all(this.widgets.map((widget) => widget.update()));
-	};
-
-	private addWidgetsForRoot = async () => {
-		if (!existsSync(join(this.basePath, ".git"))) return;
-
-		const rootEl = this.createRootWidgetContainer();
-		if (!rootEl) return;
-
-		const alreadyWidgetized = this.widgets.some((widget) =>
-			widget.getParent().isEqualNode(rootEl)
-		);
-		if (alreadyWidgetized) return;
-
-		await this.registerWidgets(rootEl, this.basePath);
 	};
 
 	private addWidgetsForNewFolderItems = async () =>
