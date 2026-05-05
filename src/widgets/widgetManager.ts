@@ -87,19 +87,18 @@ export class WidgetManager {
 	}
 
 	private createRootWidgetContainer(): HTMLElement | undefined {
-		const containerEl = this.fileExplorerHandler.fileExplorer?.containerEl;
-		if (!containerEl) return undefined;
-
-		const existing = containerEl.querySelector<HTMLElement>('#git-root-widget-container');
+		const existing = document.querySelector<HTMLElement>('#git-root-widget-container');
 		if (existing) return existing;
 
-		const navHeader = containerEl.querySelector<HTMLElement>('.nav-header');
-		if (!navHeader) return undefined;
+		const vaultProfile = document.querySelector<HTMLElement>('.workspace-sidedock-vault-profile');
+		if (!vaultProfile) return undefined;
 
 		const rootEl = document.createElement('div');
 		rootEl.id = 'git-root-widget-container';
 		rootEl.setAttribute('data-path', '/');
-		navHeader.appendChild(rootEl);
+
+		const vaultActions = vaultProfile.querySelector('.workspace-drawer-vault-actions');
+		vaultProfile.insertBefore(rootEl, vaultActions);
 
 		return rootEl;
 	}
