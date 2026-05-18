@@ -1,5 +1,4 @@
 :root {
-  --git-widget-repo: #41697A;
   --git-widget-changes: #b38522;
   --git-widget-success: #129060;
   --git-widget-error: #ff4d4d;
@@ -24,7 +23,7 @@
     margin-left: 0.5em;
     align-self: center;
 }
-.git-widget-container .nav-folder-title-content,.nav-file-title-content {
+.nav-folder-title-content:has(+ .git-widget),.nav-file-title-content:has(+ .git-widget) {
   flex-grow: 1;
 }
 .git-widget-changes {
