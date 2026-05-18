@@ -34,8 +34,8 @@ export class NavColorUpdater {
         const cssRules: string[] = [];
 
         const fileStyle = this.navColorStyle === "colored-text" 
-            ? `color: #b38522 !important;`
-            : `color: #b38522 !important; border-left: 3px solid var(--git-changed-file-color, #b38522);`;
+            ? `color: var(--git-widget-changes) !important;`
+            : `color: var(--git-widget-changes) !important; border-left: 3px solid var(--git-changed-file-color, --git-widget-changes);`;
         
         
         changedPaths.forEach(changedPath => {
